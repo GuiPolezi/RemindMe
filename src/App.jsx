@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import { supabase } from './services/supabase'
 import AppRoutes from './routes'
 
-import './App.css'
-
 
 
 function App() {
