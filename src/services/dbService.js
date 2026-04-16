@@ -2,7 +2,7 @@ import { supabase } from './supabase'
 
 export const dbService = {
     // 1. Criar Lembrete
-    async CriarLembrete(titulo, descricao, categoria, prazo) {
+    async CriarLembrete(titulo, descricao, categoria, data_hora_prazo) {
         const {data: {user} } = await supabase.auth.getUser()
 
         const {data, error } = await supabase
@@ -11,7 +11,7 @@ export const dbService = {
                 titulo,
                 descricao,
                 categoria,
-                prazo,
+                data_hora_prazo,
                 criado_por_id: user.id,
             }])
             .select()
