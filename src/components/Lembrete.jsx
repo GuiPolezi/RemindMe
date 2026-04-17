@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { dbService } from '../services/dbService'
 import { useNavigate, Link } from "react-router-dom";
-
+import { supabase } from '../services/supabase'
 
 // Criar Lembrete
 export function AddLembrete() {
@@ -111,6 +111,62 @@ export function AddLembrete() {
                     )}
                 </button>
             </form>
+        </>
+    )
+}
+
+
+// Obter Lembrete
+
+export function GetLembrete({idLembrete}) {
+    const [lembrete, setLembrete] = useState(null) // UseState para esperar pelo objeto
+    const [loading, setLoading] = useState(true)
+
+    const [usuarioLogado, setUsuarioLogado] = useState(null)
+    const navigate = useNavigate();
+
+    // Estados para edição de Lembrete
+
+
+    useEffect(() => {
+        if (!idLembrete) {
+            setLoading(false)
+            return
+        }
+        async function carregarDados() {
+            try {
+                const {data: {user}} = await supabase.auth.getUser();
+                setUsuarioLogado(user);
+
+                const dados = await dbService.getLembrete(idLembrete)
+                setLembrete(dados)
+            } catch (error) {
+                alert("Erro ao buscar Lembrete: " + error.message)
+            } finally {
+                setLoading(false) // Tira o aviso de carregando
+            }
+        }
+        if (idLembrete) {
+            carregarDados();
+        }
+    }, [idLembrete]) // Colocamos o ID para o React atualizar se o ID Mudar
+
+    // O que aparece na tela enquanto os dados carregam
+    if (loading) {
+        return <p>Carregando Lembretes...</p>
+    }
+
+    if (!lembrete) {
+        return <p>Lembrete não encontrado</p>
+    }
+
+    // Depois dos dados carregarem
+    return (
+        <>
+            <h2>{lembrete.titulo}</h2>
+            <p>{lembrete.descricao}</p>
+            <p>{lembrete.categoria}</p>
+            <p>{lembrete.data_hora_prazo}</p>
         </>
     )
 }

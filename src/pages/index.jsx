@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Logout } from '../components/Logout'
-import { AddLembrete } from '../components/Lembrete'
+import { AddLembrete, GetLembrete } from '../components/Lembrete'
 
 export function Home() {
     return (
@@ -8,6 +8,7 @@ export function Home() {
             <h1>Hello World</h1>
             <Logout />
             <AddLembrete />
+            <GetLembrete idLembrete={1}/>
         </>
     )
 }
