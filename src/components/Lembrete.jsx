@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { dbService } from '../services/dbService'
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from '../services/supabase'
+import  FullCalendar  from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction'
 
 // Criar Lembrete
 export function AddLembrete() {
@@ -167,6 +170,65 @@ export function GetLembrete({idLembrete}) {
             <p>{lembrete.descricao}</p>
             <p>{lembrete.categoria}</p>
             <p>{lembrete.data_hora_prazo}</p>
+        </>
+    )
+}
+
+// Obtendo todos os Lembretes do usuário com o calendario integrado @fullcalendar
+export function GetCalendarLembretes() {
+    const [eventos, setEventos] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function carregarLembretes() {
+            try {
+                // busca dados supabase
+                const dadosLembretes = await dbService.getAllLembretes();
+
+                const eventosFormatados = dadosLembretes.map((lembrete) => ({
+                    id: lembrete.id_lembrete,
+                    title: lembrete.titulo,
+                    date: lembrete.data_hora_prazo, // O FullCalendar lê ISO Strings
+                    extendProps: { // Guardando dados extras
+                        categoria: lembrete.categoria,
+                        descricao: lembrete.descricao
+                    }
+                }));
+                
+                setEventos(eventosFormatados);
+            } catch (error) {
+                    alert("Erro ao carregar calendário " + error.message)
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        carregarLembretes();
+    }, []);
+
+    // Função: Quando o usuario clica no lembrete
+    const handleCliqueEvento = (info) => {
+        alert(`Você clicou no lembrete: ${info.event.title}`);
+        // Daria para redirecionar para página de edição aqui
+        // Navigate
+    }
+
+    if (loading) {
+        return <p>Carregando calendário</p>;
+    }
+
+    return (
+        <>
+        <FullCalendar 
+            plugins={[dayGridPlugin, interactionPlugin]}
+            initialView='dayGridMonth'
+            events={eventos}
+            eventClick={handleCliqueEvento}
+            locale="pt-br"
+            buttonText={{
+                today: 'Hoje'
+            }}
+        />
         </>
     )
 }

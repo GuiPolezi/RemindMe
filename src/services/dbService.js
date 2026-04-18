@@ -33,4 +33,17 @@ export const dbService = {
         return data
     },
 
+    // 1.1 Obter Lembrete Criado
+    async getAllLembretes(idLembrete) {
+        const {data: {user}} = await supabase.auth.getUser();
+
+        const {data, error} = await supabase
+            .from('lembretes')
+            .select('*')
+            .eq('criado_por_id', user.id)
+            
+        if (error) throw error
+        return data
+    },
+
 }
