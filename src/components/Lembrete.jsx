@@ -185,15 +185,25 @@ export function GetCalendarLembretes() {
                 // busca dados supabase
                 const dadosLembretes = await dbService.getAllLembretes();
 
-                const eventosFormatados = dadosLembretes.map((lembrete) => ({
-                    id: lembrete.id_lembrete,
-                    title: lembrete.titulo,
-                    date: lembrete.data_hora_prazo, // O FullCalendar lê ISO Strings
-                    extendProps: { // Guardando dados extras
-                        categoria: lembrete.categoria,
-                        descricao: lembrete.descricao
+                const eventosFormatados = dadosLembretes.map((lembrete) => {
+                    const data = new Date(lembrete.data_hora_prazo);
+
+                    return {
+
+                    
+                        id: lembrete.id_lembrete,
+                        title: lembrete.titulo,
+                        date: lembrete.data_hora_prazo, // O FullCalendar lê ISO Strings
+                        extendedProps: { // Guardando dados extras
+                            categoria: lembrete.categoria,
+                            descricao: lembrete.descricao,
+                            horaFormatada: data.toLocaleTimeString('pt-BR', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })
+                        }
                     }
-                }));
+                });
                 
                 setEventos(eventosFormatados);
             } catch (error) {
@@ -208,9 +218,31 @@ export function GetCalendarLembretes() {
 
     // Função: Quando o usuario clica no lembrete
     const handleCliqueEvento = (info) => {
-        alert(`Você clicou no lembrete: ${info.event.title}`);
+        alert(`Você clicou no lembrete: ${info.event.title} ${info.event.extendedProps.categoria}`);
         // Daria para redirecionar para página de edição aqui
         // Navigate
+    }
+
+    // Função ver Card do evento
+    const handleVerEvento = (view) => {
+
+        const data = view.event.start;
+
+        const hora = data?.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        return (
+            <div style={{ padding: '2px' }}>
+            <div style={{ fontWeight: 'bold' }}>
+                {view.event.title}
+            </div>
+            <div style={{ fontSize: '10px', color: 'gray' }}>
+                {view.event.extendedProps.categoria}
+                <strong>{view.event.extendedProps.horaFormatada}</strong>
+            </div>
+        </div>
+        )
     }
 
     if (loading) {
@@ -219,11 +251,12 @@ export function GetCalendarLembretes() {
 
     return (
         <>
-        <FullCalendar 
+        <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView='dayGridMonth'
             events={eventos}
             eventClick={handleCliqueEvento}
+            eventContent={handleVerEvento}
             locale="pt-br"
             buttonText={{
                 today: 'Hoje'
