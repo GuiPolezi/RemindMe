@@ -3,6 +3,7 @@ import { Login } from "./components/Login"
 import { Register } from "./components/Register"
 import { PublicRoute } from "./components/PublicRoute"
 import { PrivateRoute } from "./components/PrivateRoute"
+import { AddLembrete } from "./components/Lembrete"
 import { Home } from './pages/index'
 
 
@@ -34,6 +35,15 @@ export default function AppRoutes({ session }) {
           <PublicRoute session={session}>
             <Register />
           </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/criarlembrete"
+        element={
+          <PrivateRoute session={session}>
+            <AddLembrete />
+          </PrivateRoute>
         }
       />
 
