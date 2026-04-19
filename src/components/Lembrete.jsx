@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { dbService } from '../services/dbService'
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from '../services/supabase'
@@ -394,6 +394,60 @@ export function GetCalendarLembretes() {
 export function GetListaLembretes() {
     const [lembretes, setLembretes] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // ─── NOTIFICAÇÕES ───────────────────────────────────────────
+const notificacoesEnviadas = useRef(new Set()); // guarda IDs já notificados
+
+// Pede permissão ao carregar
+useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission();
+    }
+}, []);
+
+// Verifica prazos a cada minuto
+useEffect(() => {
+    if (lembretes.length === 0) return;
+
+    function verificarPrazos() {
+        if (Notification.permission !== "granted") return;
+
+        const agora = new Date();
+
+        lembretes.forEach((l) => {
+            const prazo = new Date(l.data_hora_prazo);
+            const diffMs = prazo - agora;
+            const diffMin = diffMs / (1000 * 60);
+
+            // Notifica se faltar entre 0 e 60 minutos e ainda não notificou
+            const chave = `${l.id_lembrete}-1h`;
+            if (diffMin > 0 && diffMin <= 60 && !notificacoesEnviadas.current.has(chave)) {
+                notificacoesEnviadas.current.add(chave);
+                new Notification("⏰ Lembrete próximo do prazo!", {
+                    body: `"${l.titulo}" vence em ${Math.ceil(diffMin)} minutos.`,
+                    icon: "/favicon.ico",
+                });
+            }
+
+            // Notifica se acabou de vencer (última hora)
+            const chaveVencido = `${l.id_lembrete}-vencido`;
+            if (diffMs < 0 && diffMs > -1000 * 60 * 60 && !notificacoesEnviadas.current.has(chaveVencido)) {
+                notificacoesEnviadas.current.add(chaveVencido);
+                new Notification("🔴 Lembrete vencido!", {
+                    body: `"${l.titulo}" passou do prazo.`,
+                    icon: "/favicon.ico",
+                });
+            }
+        });
+    }
+
+    verificarPrazos(); // roda imediatamente ao carregar
+    const intervalo = setInterval(verificarPrazos, 60 * 1000); // repete a cada 1 min
+    return () => clearInterval(intervalo); // limpa ao desmontar
+
+}, [lembretes]); // roda sempre que lembretes mudar
+
+
     const coresPorCategoria = {
         "Trabalho":  "#3b82f6",
         "Casa":      "#22c55e",

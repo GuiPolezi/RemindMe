@@ -357,8 +357,7 @@
 /* Estilizando Navegação: Lista */
 .nav-lista {
     color: white;
-    background-color: #111;
+    background-color: rgb(10, 10, 10);
     padding: 10px;
     border-radius: 10px;
-    border-top-left-radius: 0px;
 }
