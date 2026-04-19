@@ -233,17 +233,20 @@ export function GetCalendarLembretes() {
         // Navigate
     }
 
-    // Função ver Card do evento
+    // Função ver Card do evento 
     const handleVerEvento = useCallback((view) => {
     return (
-        <div style={{ padding: '2px' }}>
-            <div style={{ fontWeight: 'bold' }}>{view.event.title}</div>
-            <div style={{ fontSize: '10px', color: 'red' }}>
-                {view.event.extendedProps.categoria} <strong>{view.event.extendedProps.horaFormatada}</strong>
-            </div>
+        <div className='flex' style={{
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+            whiteSpace: 'normal',  // ← adicione isso
+            width: '100%',         // ← e isso
+        }}>
+            <p>{view.event.extendedProps.horaFormatada} - {view.event.extendedProps.categoria}</p>
         </div>
     );
-}, []); // [] significa que a função nunca muda
+    
+    }, []); // [] significa que a função nunca muda 
 
     if (loading) {
         return <p>Carregando calendário</p>;

@@ -195,7 +195,7 @@ export function Home() {
                             <span>ME</span>
                         </h1>
                     </div>
-                    <div className="col-span-2 sm:col-span-1 self-end flex justify-center sm:justify-end">
+                    <div className="col-span-2 sm:col-span-1 self-center flex justify-center sm:justify-end">
                        <MenuButton />
                     </div>
                 </div>
