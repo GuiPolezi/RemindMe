@@ -228,3 +228,19 @@
 .dropdown-item.danger:hover .accent-bar {
     background: #ff4444;
 }
+
+/* Estilizando Calendar seção */
+
+/* Estilizando menu da navegação */
+.nav {
+      background: "none";
+      cursor: "pointer";
+      font-size: 30px;
+}
+/* Estilizando Navegação: Calendar */
+
+.nav-calendar {
+    color: white;
+    background-color: #111;
+    padding: 10px;
+}

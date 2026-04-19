@@ -109,15 +109,20 @@ export function Navegacao() {
         <div>
             {/* Navegação */}
             <nav className='flex'>
-                <button
+                <button className='nav'
                     onClick={() => setAba("calendario")}
-                    
+                    style={{
+                      fontWeight: aba === "calendario" ? "bold" : "normal",
+                    }}
                 >
                     Calendário
                 </button>
-                <button
+                <button className='nav'
                     onClick={() => setAba("lista")}
-                    
+                    style={{
+                      fontWeight: aba === "lista" ? "bold" : "normal",
+                      
+                    }}
                 >
                     Lista
                 </button>
@@ -125,7 +130,7 @@ export function Navegacao() {
 
             {/* Conteúdo */}
             {aba === "calendario" &&
-                <div>
+                <div className='nav-calendar'>
                     <GetCalendarLembretes />
                 </div>
             }
