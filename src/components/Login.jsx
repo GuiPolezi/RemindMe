@@ -45,6 +45,7 @@ export function Login() {
           <input 
             type="email" 
             placeholder="seu@email.com" 
+            autoComplete="email"
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             required 
