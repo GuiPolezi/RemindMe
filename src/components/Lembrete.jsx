@@ -192,10 +192,12 @@ export function GetCalendarLembretes() {
 
                     const coresPorCategoria = {
                         "Trabalho":   "#3b82f6", // azul
-                        "Pessoal":    "#22c55e", // verde
-                        "Saúde":      "#ef4444", // vermelho
-                        "Estudo":     "#a855f7", // roxo
-                        "Financeiro": "#f59e0b", // amarelo
+                        "Casa":    "#22c55e", // verde
+                        "Saude":      "#ef4444", // vermelho
+                        "Estudos":     "#a855f7", // roxo
+                        "Financas": "#f59e0b", // amarelo
+                        "Lazer": "#606c38",
+                        "Outros": "#283618",
                     };
 
     
@@ -253,8 +255,8 @@ export function GetCalendarLembretes() {
             width: '100%',         // ← e isso
             backgroundColor: view.event.backgroundColor,
             borderRadius: '10px',
-            color: 'black',
-            padding: '2px',
+            color: 'white',
+            padding: '4px',
         }}>
             <p className='font-bold'>{view.event.extendedProps.categoria}</p>
         </div>

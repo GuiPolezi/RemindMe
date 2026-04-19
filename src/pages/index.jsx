@@ -1,13 +1,13 @@
 import { AddLembrete, GetLembrete, GetCalendarLembretes, GetListaLembretes } from '../components/Lembrete'
 import { useState, useRef, useEffect } from "react";
 import { authService } from '../services/authService'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import gsap from "gsap";
 
 
 const menuItems = [
   { icon: "◈", label: "Início", shortcut: "H", isHome: true },
-  { icon: "◎", label: "Lembretes", shortcut: "L" },
+  { icon: "◎", label: "addLembrete", shortcut: "L", isAddLembrete: true },
   { icon: "◉", label: "Calendário", shortcut: "C", isCalendar: true },
   { icon: "◐", label: "Configurações", shortcut: "S" },
   { icon: "◌", label: "Sair", shortcut: "Q", danger: true, isLogout: true},
@@ -46,6 +46,14 @@ export function MenuButton() {
     }
   }
 
+  async function handleAddLembrete() {
+    try {
+      navigate('/criarlembrete');
+    }catch (y) {
+      alert(y.message);
+    }
+  }
+
   async function handleCalendar() {
     const section = document.getElementById("calendar");
     if (section) {
@@ -56,6 +64,7 @@ export function MenuButton() {
   function handleItemClick(item) {
     if (item.isLogout) handleLogout(); // ✅ chama o logout
     if (item.isHome) handleIndex();
+    if (item.isAddLembrete) handleAddLembrete();
     if (item.isCalendar) handleCalendar();
     setOpen(false);
   }
