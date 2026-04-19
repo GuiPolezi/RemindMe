@@ -9,7 +9,6 @@ const menuItems = [
   { icon: "◈", label: "Início", shortcut: "H", isHome: true },
   { icon: "◎", label: "addLembrete", shortcut: "L", isAddLembrete: true },
   { icon: "◉", label: "Calendário", shortcut: "C", isCalendar: true },
-  { icon: "◐", label: "Configurações", shortcut: "S" },
   { icon: "◌", label: "Sair", shortcut: "Q", danger: true, isLogout: true},
 ];
 
