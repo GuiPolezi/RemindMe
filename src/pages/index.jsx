@@ -8,7 +8,7 @@ import gsap from "gsap";
 const menuItems = [
   { icon: "◈", label: "Início", shortcut: "H", isHome: true },
   { icon: "◎", label: "Lembretes", shortcut: "L" },
-  { icon: "◉", label: "Calendário", shortcut: "C" },
+  { icon: "◉", label: "Calendário", shortcut: "C", isCalendar: true },
   { icon: "◐", label: "Configurações", shortcut: "S" },
   { icon: "◌", label: "Sair", shortcut: "Q", danger: true, isLogout: true},
 ];
@@ -46,9 +46,17 @@ export default function MenuButton() {
     }
   }
 
+  async function handleCalendar() {
+    const section = document.getElementById("calendar");
+    if (section) {
+        section.scrollIntoView({ behavior: "smooth" }); // ← rola suavemente até a seção
+    }
+  }
+
   function handleItemClick(item) {
     if (item.isLogout) handleLogout(); // ✅ chama o logout
     if (item.isHome) handleIndex();
+    if (item.isCalendar) handleCalendar();
     setOpen(false);
   }
  
@@ -128,10 +136,10 @@ export function Home() {
         <>
             <section className='header p-5'>
                 <div className="grid grid-cols-2">
-                    <div className="col-span-2 sm:col-span-1 bg-gray-500">
+                    <div className="col-span-2 sm:col-span-1">
                         <h1 className='text-7xl font-bold' style={{ cursor: "default", display: "inline-flex", alignItems: "baseline" }}
                              onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-                            <span>R</span>
+                            <span>R.</span>
                             <span ref={midRef}>emind</span>
                             <span>ME</span>
                         </h1>
@@ -142,7 +150,10 @@ export function Home() {
                 </div>
             </section>
 
-            <GetCalendarLembretes />
+            <section className='calendar p-5 mt-15' id='calendar'>
+                <GetCalendarLembretes />
+            </section>
+
         </>
     );
 }
