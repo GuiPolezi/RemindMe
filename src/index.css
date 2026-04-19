@@ -325,11 +325,12 @@
   font-weight: bold;
 }
 
-/* Hover nos dias 
+/* Hover nos dias */
 .fc .fc-daygrid-day:hover {
-  background: #141414;
+  background: rgba(255, 255, 255, 0.385);
 }
 
+/*
 .fc .fc-event {
   background: #f0f0f0 !important;
   border: none !important;
@@ -343,14 +344,3 @@
   background: #ccc !important;
   cursor: pointer;
 }*/
-
-:root {
-  --fc-border-color: #222;
-  --fc-today-bg-color: #1a1a1a;
-  --fc-event-bg-color: #f0f0f0;
-  --fc-event-border-color: transparent;
-  --fc-event-text-color: #000;
-  --fc-page-bg-color: #0a0a0a;
-  --fc-neutral-bg-color: #111;
-  --fc-list-event-hover-bg-color: #1a1a1a;
-}
