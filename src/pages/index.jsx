@@ -154,7 +154,7 @@ export function Navegacao() {
             }
 
             {aba === "lista" && 
-                <div>
+                <div className='nav-lista'>
                     <GetListaLembretes />
                 </div>
             }

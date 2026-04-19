@@ -353,3 +353,12 @@
   word-break: break-word !important;
   overflow-wrap: break-word !important;
 }
+
+/* Estilizando Navegação: Lista */
+.nav-lista {
+    color: white;
+    background-color: #111;
+    padding: 10px;
+    border-radius: 10px;
+    border-top-left-radius: 0px;
+}

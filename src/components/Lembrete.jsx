@@ -406,121 +406,121 @@ export function GetListaLembretes() {
     };
 
     const styles = {
-    wrapper: {
-        padding: '24px',
-        background: '#fff',
-        minHeight: '100vh',
-        fontFamily: "'DM Mono', monospace",
-        color: '#111',
-    },
-    loadingWrapper: {
-        display: 'flex', alignItems: 'center', gap: '10px',
-        padding: '40px', justifyContent: 'center',
-    },
-    loadingDot: {
-        width: '8px', height: '8px',
-        borderRadius: '50%', background: '#111',
-    },
-    loadingText: { fontSize: '12px', color: '#999', letterSpacing: '0.1em' },
-    empty: {
-        textAlign: 'center', padding: '60px',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
-    },
-    emptyIcon: { fontSize: '32px', color: '#ccc' },
-    emptyText: { fontSize: '13px', color: '#999' },
- 
-    // Stats
-    statsGrid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-        gap: '12px',
-        marginBottom: '20px',
-    },
-    statCard: {
-        border: '1.5px solid #e5e5e5',
-        borderRadius: '12px',
-        padding: '20px 16px',
-        display: 'flex', flexDirection: 'column', gap: '4px',
-        background: '#fff',
-        transition: 'border-color 0.2s',
-    },
-    statLabel: { fontSize: '10px', letterSpacing: '0.15em', color: '#999', textTransform: 'uppercase' },
-    statNumber: { fontSize: '36px', fontWeight: '800', lineHeight: 1, color: '#000' },
-    statSub: { fontSize: '11px', color: '#bbb' },
- 
-    // Destaques
-    destaqueGrid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '12px',
-        marginBottom: '24px',
-    },
-    destaque: {
-        border: '1.5px solid #e5e5e5',
-        borderRadius: '12px',
-        padding: '18px',
-        display: 'flex', flexDirection: 'column', gap: '8px',
-        background: '#fafafa',
-    },
-    destaqueLabel: { fontSize: '10px', color: '#999', letterSpacing: '0.1em', textTransform: 'uppercase' },
-    destaqueTitulo: { fontSize: '15px', fontWeight: '700', color: '#111', margin: 0 },
-    destaqueRow: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
-    destaqueSub: { fontSize: '11px', color: '#999' },
- 
-    // Lista
-    listaWrapper: {
-        border: '1.5px solid #e5e5e5',
-        borderRadius: '12px',
-        overflow: 'hidden',
-    },
-    listaHeader: {
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '14px 20px',
-        borderBottom: '1px solid #f0f0f0',
-        background: '#fafafa',
-    },
-    listaTitulo: { fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#555' },
-    listaCount: {
-        fontSize: '10px', background: '#111', color: '#fff',
-        borderRadius: '20px', padding: '2px 10px',
-    },
-    lembreteRow: {
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '16px 20px',
-        borderBottom: '1px solid #f5f5f5',
-        background: '#fff',
-        transition: 'background 0.15s',
-        cursor: 'default',
-        animation: 'fadeUp 0.4s ease both',
-        gap: '12px',
-    },
-    lembreteLeft: { display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0 },
-    lembreteTitulo: { fontSize: '14px', fontWeight: '600', color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-    lembreteDesc: { fontSize: '12px', color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-    lembreteMeta: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
-    lembreteData: { fontSize: '11px', color: '#bbb' },
-    lembreteRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 },
- 
-    // Badges
-    categoriaBadge: {
-        fontSize: '10px', fontWeight: '700',
-        color: '#fff', borderRadius: '20px',
-        padding: '2px 8px', letterSpacing: '0.05em',
-        textTransform: 'uppercase', whiteSpace: 'nowrap',
-    },
-    statusBadge: {
-        fontSize: '10px', fontWeight: '700',
-        border: '1px solid',
-        borderRadius: '20px',
-        padding: '2px 8px',
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        whiteSpace: 'nowrap',
-    },
-    prazoRelativo: {
-        fontSize: '11px', fontWeight: '600',
-    },
-};
+        wrapper: {
+            padding: '24px',
+            background: '#0a0a0a',       // ← fundo escuro
+            minHeight: '100vh',
+            fontFamily: "'DM Mono', monospace",
+            color: '#f0f0f0',            // ← texto claro
+        },
+        loadingWrapper: {
+            display: 'flex', alignItems: 'center', gap: '10px',
+            padding: '40px', justifyContent: 'center',
+        },
+        loadingDot: {
+            width: '8px', height: '8px',
+            borderRadius: '50%', background: '#f0f0f0', // ← claro
+        },
+        loadingText: { fontSize: '12px', color: '#555', letterSpacing: '0.1em' },
+        empty: {
+            textAlign: 'center', padding: '60px',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
+        },
+        emptyIcon: { fontSize: '32px', color: '#333' },
+        emptyText: { fontSize: '13px', color: '#555' },
+
+        // Stats
+        statsGrid: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+            gap: '12px',
+            marginBottom: '20px',
+        },
+        statCard: {
+            border: '1.5px solid #222',  // ← borda escura
+            borderRadius: '12px',
+            padding: '20px 16px',
+            display: 'flex', flexDirection: 'column', gap: '4px',
+            background: '#111',          // ← card escuro
+            transition: 'border-color 0.2s',
+        },
+        statLabel: { fontSize: '10px', letterSpacing: '0.15em', color: '#555', textTransform: 'uppercase' },
+        statNumber: { fontSize: '36px', fontWeight: '800', lineHeight: 1, color: '#f0f0f0' }, // ← claro
+        statSub: { fontSize: '11px', color: '#444' },
+
+        // Destaques
+        destaqueGrid: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '12px',
+            marginBottom: '24px',
+        },
+        destaque: {
+            border: '1.5px solid #222',  // ← borda escura
+            borderRadius: '12px',
+            padding: '18px',
+            display: 'flex', flexDirection: 'column', gap: '8px',
+            background: '#111',          // ← card escuro
+        },
+        destaqueLabel: { fontSize: '10px', color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase' },
+        destaqueTitulo: { fontSize: '15px', fontWeight: '700', color: '#f0f0f0', margin: 0 }, // ← claro
+        destaqueRow: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
+        destaqueSub: { fontSize: '11px', color: '#555' },
+
+        // Lista
+        listaWrapper: {
+            border: '1.5px solid #222',  // ← borda escura
+            borderRadius: '12px',
+            overflow: 'hidden',
+        },
+        listaHeader: {
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            padding: '14px 20px',
+            borderBottom: '1px solid #1a1a1a',
+            background: '#111',          // ← header escuro
+        },
+        listaTitulo: { fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#555' },
+        listaCount: {
+            fontSize: '10px', background: '#f0f0f0', color: '#000', // ← invertido
+            borderRadius: '20px', padding: '2px 10px',
+        },
+        lembreteRow: {
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            padding: '16px 20px',
+            borderBottom: '1px solid #1a1a1a',
+            background: '#111',          // ← row escuro
+            transition: 'background 0.15s',
+            cursor: 'default',
+            animation: 'fadeUp 0.4s ease both',
+            gap: '12px',
+        },
+        lembreteLeft: { display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0 },
+        lembreteTitulo: { fontSize: '14px', fontWeight: '600', color: '#f0f0f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, // ← claro
+        lembreteDesc: { fontSize: '12px', color: '#555', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+        lembreteMeta: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
+        lembreteData: { fontSize: '11px', color: '#444' },
+        lembreteRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 },
+
+        // Badges
+        categoriaBadge: {
+            fontSize: '10px', fontWeight: '700',
+            color: '#fff', borderRadius: '20px',
+            padding: '2px 8px', letterSpacing: '0.05em',
+            textTransform: 'uppercase', whiteSpace: 'nowrap',
+        },
+        statusBadge: {
+            fontSize: '10px', fontWeight: '700',
+            border: '1px solid',
+            borderRadius: '20px',
+            padding: '2px 8px',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            whiteSpace: 'nowrap',
+        },
+        prazoRelativo: {
+            fontSize: '11px', fontWeight: '600',
+        },
+    };
 
     function calcularStatus(data_hora_prazo) {
         const agora = new Date();
@@ -629,7 +629,7 @@ export function GetListaLembretes() {
                 .dash-card:nth-child(2) { animation-delay: 0.1s; }
                 .dash-card:nth-child(3) { animation-delay: 0.15s; }
                 .dash-card:nth-child(4) { animation-delay: 0.2s; }
-                .lembrete-row:hover { background: #f7f7f7 !important; }
+                .lembrete-row:hover { background: #1a1a1a !important; }
                 .pulse { animation: pulse 1.5s ease infinite; }
             `}</style>
  
