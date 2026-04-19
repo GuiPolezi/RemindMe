@@ -8,7 +8,223 @@
 
 /* Estilizando Header Menu content */
 
-.menu {
-    background-color: red;
-    width: fit-content;
+
+
+/* Estilizando Botão Menu */
+
+
+.menu-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.menu-btn {
+
+
+    border-radius: 20px;
+    color: gray;
+    
+    font-size: 16px;
+    font-weight: 700;
+
+    padding: 12px 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #f0f0f0;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+    z-index: 0;
+}
+
+.menu-btn:hover::before,
+.menu-btn.active::before {
+    transform: scaleX(1);
+}
+
+.menu-btn:hover,
+.menu-btn.active {
+    color: #0a0a0a;
+    border-color: #f0f0f0;
+}
+
+.menu-btn span {
+    position: relative;
+    z-index: 1;
+}
+
+.burger {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    z-index: 1;
+    width: 18px;
+}
+
+.burger-line {
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.25s ease, opacity 0.25s ease, width 0.25s ease;
+    transform-origin: center;
+}
+
+.burger-line:nth-child(1) {
+    width: 18px;
+}
+
+.burger-line:nth-child(2) {
+    width: 12px;
+}
+
+.burger-line:nth-child(3) {
+    width: 18px;
+}
+
+.active .burger-line:nth-child(1) {
+    transform: translateY(5.5px) rotate(45deg);
+    width: 18px;
+}
+
+.active .burger-line:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.active .burger-line:nth-child(3) {
+    transform: translateY(-5.5px) rotate(-45deg);
+    width: 18px;
+}
+
+/* Dropdown */
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 220px;
+    background: #111;
+    border: 1.5px solid #222;
+    z-index: 100;
+    overflow: hidden;
+    animation: slideDown 0.2s ease forwards;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: #444;
+    text-transform: uppercase;
+    border-bottom: 1px solid #1e1e1e;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #1a1a1a;
+    position: relative;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: #1a1a1a;
+}
+
+.dropdown-item.danger:hover {
+    background: #1a0808;
+}
+
+.item-icon {
+    font-size: 14px;
+    color: #555;
+    width: 20px;
+    text-align: center;
+    transition: color 0.15s;
+}
+
+.dropdown-item:hover .item-icon {
+    color: #f0f0f0;
+}
+
+.dropdown-item.danger:hover .item-icon {
+    color: #ff4444;
+}
+
+.item-label {
+    flex: 1;
+    font-size: 12px;
+    color: #aaa;
+    letter-spacing: 0.05em;
+    transition: color 0.15s;
+}
+
+.dropdown-item:hover .item-label {
+    color: #f0f0f0;
+}
+
+.dropdown-item.danger:hover .item-label {
+    color: #ff4444;
+}
+
+.item-shortcut {
+    font-size: 10px;
+    color: #333;
+    letter-spacing: 0.1em;
+    border: 1px solid #222;
+    padding: 2px 5px;
+}
+
+.dropdown-item:hover .item-shortcut {
+    border-color: #444;
+    color: #555;
+}
+
+.accent-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #f0f0f0;
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.15s ease;
+}
+
+.dropdown-item:hover .accent-bar {
+    transform: scaleY(1);
+}
+
+.dropdown-item.danger:hover .accent-bar {
+    background: #ff4444;
 }
