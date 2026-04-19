@@ -311,7 +311,7 @@
 
 .fc-daygrid-day {
     border-radius: 15px;
-    background-color: gray;
+    background-color: white;
     padding: 4px !important;
 }
 
@@ -322,13 +322,15 @@
 }
 
 .fc .fc-day-today .fc-daygrid-day-number {
-  color: black;
+  color: white;
   font-weight: bold;
+  background-color: black;
+  border-radius: 20px;
 }
 
 /* Hover nos dias */
 .fc .fc-daygrid-day:hover {
-  background: rgba(255, 255, 255, 0.385);
+  background: #fefae09c;
 }
 
 /* Eventos */

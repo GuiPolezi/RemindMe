@@ -390,50 +390,168 @@ export function GetCalendarLembretes() {
 
 
 /* FUNÇÕES DO DASHBOARD DOS PRAZOS */
-const coresPorCategoria = {
-    "Trabalho":  "#3b82f6",
-    "Casa":      "#22c55e",
-    "Saude":     "#ef4444",
-    "Estudos":   "#a855f7",
-    "Financas":  "#f59e0b",
-    "Lazer":     "#606c38",
-    "Compras":   "#0ea5e9",
-    "Outros":    "#6b7280",
-};
-function calcularStatus(data_hora_prazo) {
-    const agora = new Date();
-    const prazo = new Date(data_hora_prazo);
-    const diffMs = prazo - agora;
-    const diffHoras = diffMs / (1000 * 60 * 60);
-    const diffDias = diffMs / (1000 * 60 * 60 * 24);
- 
-    if (diffMs < 0) return { label: "Vencido", cor: "#ef4444", prioridade: 0 };
-    if (diffHoras <= 24) return { label: "Urgente", cor: "#f59e0b", prioridade: 1 };
-    if (diffDias <= 7) return { label: "Esta semana", cor: "#3b82f6", prioridade: 2 };
-    return { label: "Em dia", cor: "#22c55e", prioridade: 3 };
-}
- 
-function formatarPrazo(data_hora_prazo) {
-    const prazo = new Date(data_hora_prazo);
-    const agora = new Date();
-    const diffMs = prazo - agora;
-    const diffDias = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24));
-    const diffHoras = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60));
-    const diffMin = Math.floor(Math.abs(diffMs) / (1000 * 60));
- 
-    if (diffMs < 0) {
-        if (diffDias > 0) return `Venceu há ${diffDias}d`;
-        if (diffHoras > 0) return `Venceu há ${diffHoras}h`;
-        return `Venceu há ${diffMin}min`;
-    }
-    if (diffDias > 0) return `Em ${diffDias}d`;
-    if (diffHoras > 0) return `Em ${diffHoras}h`;
-    return `Em ${diffMin}min`;
-}
- 
+
 export function GetListaLembretes() {
     const [lembretes, setLembretes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const coresPorCategoria = {
+        "Trabalho":  "#3b82f6",
+        "Casa":      "#22c55e",
+        "Saude":     "#ef4444",
+        "Estudos":   "#a855f7",
+        "Financas":  "#f59e0b",
+        "Lazer":     "#606c38",
+        "Compras":   "#0ea5e9",
+        "Outros":    "#6b7280",
+    };
+
+    const styles = {
+    wrapper: {
+        padding: '24px',
+        background: '#fff',
+        minHeight: '100vh',
+        fontFamily: "'DM Mono', monospace",
+        color: '#111',
+    },
+    loadingWrapper: {
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '40px', justifyContent: 'center',
+    },
+    loadingDot: {
+        width: '8px', height: '8px',
+        borderRadius: '50%', background: '#111',
+    },
+    loadingText: { fontSize: '12px', color: '#999', letterSpacing: '0.1em' },
+    empty: {
+        textAlign: 'center', padding: '60px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
+    },
+    emptyIcon: { fontSize: '32px', color: '#ccc' },
+    emptyText: { fontSize: '13px', color: '#999' },
+ 
+    // Stats
+    statsGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+        gap: '12px',
+        marginBottom: '20px',
+    },
+    statCard: {
+        border: '1.5px solid #e5e5e5',
+        borderRadius: '12px',
+        padding: '20px 16px',
+        display: 'flex', flexDirection: 'column', gap: '4px',
+        background: '#fff',
+        transition: 'border-color 0.2s',
+    },
+    statLabel: { fontSize: '10px', letterSpacing: '0.15em', color: '#999', textTransform: 'uppercase' },
+    statNumber: { fontSize: '36px', fontWeight: '800', lineHeight: 1, color: '#000' },
+    statSub: { fontSize: '11px', color: '#bbb' },
+ 
+    // Destaques
+    destaqueGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '12px',
+        marginBottom: '24px',
+    },
+    destaque: {
+        border: '1.5px solid #e5e5e5',
+        borderRadius: '12px',
+        padding: '18px',
+        display: 'flex', flexDirection: 'column', gap: '8px',
+        background: '#fafafa',
+    },
+    destaqueLabel: { fontSize: '10px', color: '#999', letterSpacing: '0.1em', textTransform: 'uppercase' },
+    destaqueTitulo: { fontSize: '15px', fontWeight: '700', color: '#111', margin: 0 },
+    destaqueRow: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
+    destaqueSub: { fontSize: '11px', color: '#999' },
+ 
+    // Lista
+    listaWrapper: {
+        border: '1.5px solid #e5e5e5',
+        borderRadius: '12px',
+        overflow: 'hidden',
+    },
+    listaHeader: {
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '14px 20px',
+        borderBottom: '1px solid #f0f0f0',
+        background: '#fafafa',
+    },
+    listaTitulo: { fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#555' },
+    listaCount: {
+        fontSize: '10px', background: '#111', color: '#fff',
+        borderRadius: '20px', padding: '2px 10px',
+    },
+    lembreteRow: {
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '16px 20px',
+        borderBottom: '1px solid #f5f5f5',
+        background: '#fff',
+        transition: 'background 0.15s',
+        cursor: 'default',
+        animation: 'fadeUp 0.4s ease both',
+        gap: '12px',
+    },
+    lembreteLeft: { display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0 },
+    lembreteTitulo: { fontSize: '14px', fontWeight: '600', color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    lembreteDesc: { fontSize: '12px', color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    lembreteMeta: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
+    lembreteData: { fontSize: '11px', color: '#bbb' },
+    lembreteRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 },
+ 
+    // Badges
+    categoriaBadge: {
+        fontSize: '10px', fontWeight: '700',
+        color: '#fff', borderRadius: '20px',
+        padding: '2px 8px', letterSpacing: '0.05em',
+        textTransform: 'uppercase', whiteSpace: 'nowrap',
+    },
+    statusBadge: {
+        fontSize: '10px', fontWeight: '700',
+        border: '1px solid',
+        borderRadius: '20px',
+        padding: '2px 8px',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+    },
+    prazoRelativo: {
+        fontSize: '11px', fontWeight: '600',
+    },
+};
+
+    function calcularStatus(data_hora_prazo) {
+        const agora = new Date();
+        const prazo = new Date(data_hora_prazo);
+        const diffMs = prazo - agora;
+        const diffHoras = diffMs / (1000 * 60 * 60);
+        const diffDias = diffMs / (1000 * 60 * 60 * 24);
+    
+        if (diffMs < 0) return { label: "Vencido", cor: "#ef4444", prioridade: 0 };
+        if (diffHoras <= 24) return { label: "Urgente", cor: "#f59e0b", prioridade: 1 };
+        if (diffDias <= 7) return { label: "Esta semana", cor: "#3b82f6", prioridade: 2 };
+        return { label: "Em dia", cor: "#22c55e", prioridade: 3 };
+    }
+    
+    function formatarPrazo(data_hora_prazo) {
+        const prazo = new Date(data_hora_prazo);
+        const agora = new Date();
+        const diffMs = prazo - agora;
+        const diffDias = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24));
+        const diffHoras = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60));
+        const diffMin = Math.floor(Math.abs(diffMs) / (1000 * 60));
+    
+        if (diffMs < 0) {
+            if (diffDias > 0) return `Venceu há ${diffDias}d`;
+            if (diffHoras > 0) return `Venceu há ${diffHoras}h`;
+            return `Venceu há ${diffMin}min`;
+        }
+        if (diffDias > 0) return `Em ${diffDias}d`;
+        if (diffHoras > 0) return `Em ${diffHoras}h`;
+        return `Em ${diffMin}min`;
+    }
  
     useEffect(() => {
         async function carregar() {
@@ -672,119 +790,3 @@ export function GetListaLembretes() {
     );
 }
  
-const styles = {
-    wrapper: {
-        padding: '24px',
-        background: '#fff',
-        minHeight: '100vh',
-        fontFamily: "'DM Mono', monospace",
-        color: '#111',
-    },
-    loadingWrapper: {
-        display: 'flex', alignItems: 'center', gap: '10px',
-        padding: '40px', justifyContent: 'center',
-    },
-    loadingDot: {
-        width: '8px', height: '8px',
-        borderRadius: '50%', background: '#111',
-    },
-    loadingText: { fontSize: '12px', color: '#999', letterSpacing: '0.1em' },
-    empty: {
-        textAlign: 'center', padding: '60px',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
-    },
-    emptyIcon: { fontSize: '32px', color: '#ccc' },
-    emptyText: { fontSize: '13px', color: '#999' },
- 
-    // Stats
-    statsGrid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-        gap: '12px',
-        marginBottom: '20px',
-    },
-    statCard: {
-        border: '1.5px solid #e5e5e5',
-        borderRadius: '12px',
-        padding: '20px 16px',
-        display: 'flex', flexDirection: 'column', gap: '4px',
-        background: '#fff',
-        transition: 'border-color 0.2s',
-    },
-    statLabel: { fontSize: '10px', letterSpacing: '0.15em', color: '#999', textTransform: 'uppercase' },
-    statNumber: { fontSize: '36px', fontWeight: '800', lineHeight: 1, color: '#000' },
-    statSub: { fontSize: '11px', color: '#bbb' },
- 
-    // Destaques
-    destaqueGrid: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '12px',
-        marginBottom: '24px',
-    },
-    destaque: {
-        border: '1.5px solid #e5e5e5',
-        borderRadius: '12px',
-        padding: '18px',
-        display: 'flex', flexDirection: 'column', gap: '8px',
-        background: '#fafafa',
-    },
-    destaqueLabel: { fontSize: '10px', color: '#999', letterSpacing: '0.1em', textTransform: 'uppercase' },
-    destaqueTitulo: { fontSize: '15px', fontWeight: '700', color: '#111', margin: 0 },
-    destaqueRow: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
-    destaqueSub: { fontSize: '11px', color: '#999' },
- 
-    // Lista
-    listaWrapper: {
-        border: '1.5px solid #e5e5e5',
-        borderRadius: '12px',
-        overflow: 'hidden',
-    },
-    listaHeader: {
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '14px 20px',
-        borderBottom: '1px solid #f0f0f0',
-        background: '#fafafa',
-    },
-    listaTitulo: { fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#555' },
-    listaCount: {
-        fontSize: '10px', background: '#111', color: '#fff',
-        borderRadius: '20px', padding: '2px 10px',
-    },
-    lembreteRow: {
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '16px 20px',
-        borderBottom: '1px solid #f5f5f5',
-        background: '#fff',
-        transition: 'background 0.15s',
-        cursor: 'default',
-        animation: 'fadeUp 0.4s ease both',
-        gap: '12px',
-    },
-    lembreteLeft: { display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0 },
-    lembreteTitulo: { fontSize: '14px', fontWeight: '600', color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-    lembreteDesc: { fontSize: '12px', color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-    lembreteMeta: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
-    lembreteData: { fontSize: '11px', color: '#bbb' },
-    lembreteRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 },
- 
-    // Badges
-    categoriaBadge: {
-        fontSize: '10px', fontWeight: '700',
-        color: '#fff', borderRadius: '20px',
-        padding: '2px 8px', letterSpacing: '0.05em',
-        textTransform: 'uppercase', whiteSpace: 'nowrap',
-    },
-    statusBadge: {
-        fontSize: '10px', fontWeight: '700',
-        border: '1px solid',
-        borderRadius: '20px',
-        padding: '2px 8px',
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        whiteSpace: 'nowrap',
-    },
-    prazoRelativo: {
-        fontSize: '11px', fontWeight: '600',
-    },
-};
