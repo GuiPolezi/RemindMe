@@ -116,8 +116,8 @@ export function Navegacao() {
                       backgroundColor: aba === "calendario" ? "#111" : "white",
                       padding:  aba === "calendario" ? "10px" : "0px",
                       color: aba === "calendario" ? "white" : "gray",
-                      borderTopLeftRadius: aba === "calendario" ? "20px" : "0px",
-                      borderTopRightRadius: aba === "calendario" ? "20px" : "0px",
+                      borderTopLeftRadius: aba === "calendario" ? "10px" : "0px",
+                      borderTopRightRadius: aba === "calendario" ? "10px" : "0px",
                     }}
                 >
                     Calendário
@@ -129,8 +129,8 @@ export function Navegacao() {
                       backgroundColor: aba === "lista" ? "#111" : "white",
                       padding:  aba === "lista" ? "10px" : "0px",
                       color: aba === "lista" ? "white" : "gray",
-                      borderTopLeftRadius: aba === "lista" ? "20px" : "0px",
-                      borderTopRightRadius: aba === "lista" ? "20px" : "0px",
+                      borderTopLeftRadius: aba === "lista" ? "10px" : "0px",
+                      borderTopRightRadius: aba === "lista" ? "10px" : "0px",
                     }}
                 >
                     Lista

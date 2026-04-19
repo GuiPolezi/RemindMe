@@ -234,7 +234,7 @@
 /* Estilizando menu da navegação */
 .nav {
       background: "none";
-      cursor: "pointer";
+      cursor: pointer;
       font-size: 25px;
       color: gray
 }
@@ -244,86 +244,88 @@
     color: white;
     background-color: #111;
     padding: 10px;
+    border-radius: 10px;
+    border-top-left-radius: 0px;
 }
 
 
 
 /* Todas as Variaveis do fullcalendar */
+
 /* Fundo do header */
 .fc .fc-toolbar {
-  background: #111;
-  padding: 12px;
+  padding: 50px;
+  font-weight: bold;
 }
 
-/* Botões (Hoje, anterior, próximo) */
+ /* Botões (Hoje, anterior, próximo) */
 .fc .fc-button {
-  background: transparent !important;
-  border: 1px solid #333 !important;
-  color: #f0f0f0 !important;
-  border-radius: 0 !important;
-  font-family: 'DM Mono', monospace !important;
+  background: white;
+
+  color: black;
+  border-radius: 10px;
 }
 
 .fc .fc-button:hover {
-  background: #f0f0f0 !important;
-  color: #000 !important;
-}
-
-/* Botão ativo */
-.fc .fc-button-active {
-  background: #f0f0f0 !important;
-  color: #000 !important;
+  background: #f0f0f0;
+  color: #000;
 }
 
 /* Título do mês */
 .fc .fc-toolbar-title {
-  color: #f0f0f0;
-  font-size: 1.2rem;
-  font-family: 'Syne', sans-serif;
+ text-transform: uppercase;
+
 }
 
-/* Fundo geral */
-.fc {
-  background: #0a0a0a;
-  color: #f0f0f0;
-}
 
 /* Bordas da grade */
 .fc .fc-scrollgrid {
-  border-color: #222 !important;
+  border: none;
 }
 
-.fc td, .fc th {
-  border-color: #222 !important;
+
+.fc th {
+  border: 2px solid #111;
+}
+
+.fc td {
+    border: 2px solid #111;
 }
 
 /* Cabeçalho dos dias (Dom, Seg...) */
 .fc .fc-col-header-cell {
-  background: #111;
+  background: white;
   padding: 8px 0;
+  text-transform: uppercase;
   font-size: 11px;
-  letter-spacing: 0.1em;
-  color: #555;
+  color: black;
+  border-radius: 15px;
 }
 
 /* Número do dia */
 .fc .fc-daygrid-day-number {
-  color: #666;
+  color: black;
   font-size: 12px;
   padding: 6px;
 }
 
+.fc-daygrid-day {
+    border-radius: 15px;
+    background-color: gray;
+}
+
+
 /* Dia de hoje */
 .fc .fc-day-today {
-  background: #1a1a1a !important;
+  background: white !important;
 }
 
 .fc .fc-day-today .fc-daygrid-day-number {
-  color: #f0f0f0;
+  color: black;
   font-weight: bold;
 }
 
-/* Hover nos dias */
+/* Hover nos dias 
 .fc .fc-daygrid-day:hover {
   background: #141414;
 }
@@ -340,7 +342,7 @@
 .fc .fc-event:hover {
   background: #ccc !important;
   cursor: pointer;
-}
+}*/
 
 :root {
   --fc-border-color: #222;
