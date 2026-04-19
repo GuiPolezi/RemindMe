@@ -388,8 +388,403 @@ export function GetCalendarLembretes() {
     )
 }
 
-export function GetListaLembretes() {
-    return (
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, quibusdam?</p>
-    )
+
+/* FUNÇÕES DO DASHBOARD DOS PRAZOS */
+const coresPorCategoria = {
+    "Trabalho":  "#3b82f6",
+    "Casa":      "#22c55e",
+    "Saude":     "#ef4444",
+    "Estudos":   "#a855f7",
+    "Financas":  "#f59e0b",
+    "Lazer":     "#606c38",
+    "Compras":   "#0ea5e9",
+    "Outros":    "#6b7280",
+};
+function calcularStatus(data_hora_prazo) {
+    const agora = new Date();
+    const prazo = new Date(data_hora_prazo);
+    const diffMs = prazo - agora;
+    const diffHoras = diffMs / (1000 * 60 * 60);
+    const diffDias = diffMs / (1000 * 60 * 60 * 24);
+ 
+    if (diffMs < 0) return { label: "Vencido", cor: "#ef4444", prioridade: 0 };
+    if (diffHoras <= 24) return { label: "Urgente", cor: "#f59e0b", prioridade: 1 };
+    if (diffDias <= 7) return { label: "Esta semana", cor: "#3b82f6", prioridade: 2 };
+    return { label: "Em dia", cor: "#22c55e", prioridade: 3 };
 }
+ 
+function formatarPrazo(data_hora_prazo) {
+    const prazo = new Date(data_hora_prazo);
+    const agora = new Date();
+    const diffMs = prazo - agora;
+    const diffDias = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24));
+    const diffHoras = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60));
+    const diffMin = Math.floor(Math.abs(diffMs) / (1000 * 60));
+ 
+    if (diffMs < 0) {
+        if (diffDias > 0) return `Venceu há ${diffDias}d`;
+        if (diffHoras > 0) return `Venceu há ${diffHoras}h`;
+        return `Venceu há ${diffMin}min`;
+    }
+    if (diffDias > 0) return `Em ${diffDias}d`;
+    if (diffHoras > 0) return `Em ${diffHoras}h`;
+    return `Em ${diffMin}min`;
+}
+ 
+export function GetListaLembretes() {
+    const [lembretes, setLembretes] = useState([]);
+    const [loading, setLoading] = useState(true);
+ 
+    useEffect(() => {
+        async function carregar() {
+            try {
+                const dados = await dbService.getAllLembretes();
+                setLembretes(dados);
+            } catch (error) {
+                alert("Erro ao carregar lembretes: " + error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+        carregar();
+    }, []);
+ 
+    if (loading) return (
+        <div style={styles.loadingWrapper}>
+            <div style={styles.loadingDot} className="pulse" />
+            <span style={styles.loadingText}>Carregando</span>
+        </div>
+    );
+ 
+    if (lembretes.length === 0) return (
+        <div style={styles.empty}>
+            <span style={styles.emptyIcon}>◌</span>
+            <p style={styles.emptyText}>Nenhum lembrete ainda.</p>
+        </div>
+    );
+ 
+    const agora = new Date();
+ 
+    // Derivados
+    const ordenadosPorData = [...lembretes].sort((a, b) =>
+        new Date(b.data_hora_prazo) - new Date(a.data_hora_prazo)
+    );
+    const maisRecente = ordenadosPorData[0];
+ 
+    const vencidos = lembretes.filter(l => new Date(l.data_hora_prazo) < agora);
+    const emDia = lembretes.filter(l => new Date(l.data_hora_prazo) >= agora);
+ 
+    const maiorPrazo = [...emDia].sort((a, b) =>
+        new Date(a.data_hora_prazo) - new Date(b.data_hora_prazo)
+    )[0];
+ 
+    const categorias = [...new Set(lembretes.map(l => l.categoria))];
+    const categoriaMaisUsada = categorias.sort((a, b) =>
+        lembretes.filter(l => l.categoria === b).length -
+        lembretes.filter(l => l.categoria === a).length
+    )[0];
+ 
+    const urgentes = lembretes.filter(l => {
+        const diff = new Date(l.data_hora_prazo) - agora;
+        return diff > 0 && diff <= 1000 * 60 * 60 * 24;
+    });
+ 
+    // Lista ordenada por status (vencidos primeiro, depois urgentes, etc)
+    const listaPrioridade = [...lembretes].sort((a, b) => {
+        return calcularStatus(a.data_hora_prazo).prioridade -
+               calcularStatus(b.data_hora_prazo).prioridade;
+    });
+ 
+    return (
+        <div style={styles.wrapper}>
+            <style>{`
+                @keyframes fadeUp {
+                    from { opacity: 0; transform: translateY(12px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.3; }
+                }
+                .dash-card { animation: fadeUp 0.4s ease both; }
+                .dash-card:nth-child(1) { animation-delay: 0.05s; }
+                .dash-card:nth-child(2) { animation-delay: 0.1s; }
+                .dash-card:nth-child(3) { animation-delay: 0.15s; }
+                .dash-card:nth-child(4) { animation-delay: 0.2s; }
+                .lembrete-row:hover { background: #f7f7f7 !important; }
+                .pulse { animation: pulse 1.5s ease infinite; }
+            `}</style>
+ 
+            {/* STATS GRID */}
+            <div style={styles.statsGrid}>
+ 
+                {/* Total */}
+                <div className="dash-card" style={styles.statCard}>
+                    <span style={styles.statLabel}>Total</span>
+                    <span style={styles.statNumber}>{lembretes.length}</span>
+                    <span style={styles.statSub}>lembretes</span>
+                </div>
+ 
+                {/* Vencidos */}
+                <div className="dash-card" style={{ ...styles.statCard, borderColor: vencidos.length > 0 ? "#ef4444" : "#e5e5e5" }}>
+                    <span style={styles.statLabel}>Vencidos</span>
+                    <span style={{ ...styles.statNumber, color: vencidos.length > 0 ? "#ef4444" : "#000" }}>
+                        {vencidos.length}
+                    </span>
+                    <span style={styles.statSub}>em atraso</span>
+                </div>
+ 
+                {/* Urgentes */}
+                <div className="dash-card" style={{ ...styles.statCard, borderColor: urgentes.length > 0 ? "#f59e0b" : "#e5e5e5" }}>
+                    <span style={styles.statLabel}>Urgentes</span>
+                    <span style={{ ...styles.statNumber, color: urgentes.length > 0 ? "#f59e0b" : "#000" }}>
+                        {urgentes.length}
+                    </span>
+                    <span style={styles.statSub}>próximas 24h</span>
+                </div>
+ 
+                {/* Em dia */}
+                <div className="dash-card" style={styles.statCard}>
+                    <span style={styles.statLabel}>Em dia</span>
+                    <span style={{ ...styles.statNumber, color: "#22c55e" }}>{emDia.length}</span>
+                    <span style={styles.statSub}>no prazo</span>
+                </div>
+ 
+            </div>
+ 
+            {/* DESTAQUES */}
+            <div style={styles.destaqueGrid}>
+ 
+                {/* Mais recente */}
+                {maisRecente && (
+                    <div className="dash-card" style={styles.destaque}>
+                        <span style={styles.destaqueLabel}>◎ Mais recente</span>
+                        <p style={styles.destaqueTitulo}>{maisRecente.titulo}</p>
+                        <div style={styles.destaqueRow}>
+                            <span style={{
+                                ...styles.categoriaBadge,
+                                backgroundColor: coresPorCategoria[maisRecente.categoria] || "#6b7280"
+                            }}>
+                                {maisRecente.categoria}
+                            </span>
+                            <span style={styles.destaqueSub}>
+                                {new Date(maisRecente.data_hora_prazo).toLocaleDateString('pt-BR')}
+                            </span>
+                        </div>
+                    </div>
+                )}
+ 
+                {/* Mais próximo do prazo */}
+                {maiorPrazo && (
+                    <div className="dash-card" style={{ ...styles.destaque, borderColor: "#f59e0b" }}>
+                        <span style={styles.destaqueLabel}>⚡ Próximo do prazo</span>
+                        <p style={styles.destaqueTitulo}>{maiorPrazo.titulo}</p>
+                        <div style={styles.destaqueRow}>
+                            <span style={{
+                                ...styles.categoriaBadge,
+                                backgroundColor: coresPorCategoria[maiorPrazo.categoria] || "#6b7280"
+                            }}>
+                                {maiorPrazo.categoria}
+                            </span>
+                            <span style={{ ...styles.destaqueSub, color: "#f59e0b", fontWeight: 700 }}>
+                                {formatarPrazo(maiorPrazo.data_hora_prazo)}
+                            </span>
+                        </div>
+                    </div>
+                )}
+ 
+                {/* Categoria mais usada */}
+                <div className="dash-card" style={styles.destaque}>
+                    <span style={styles.destaqueLabel}>◈ Categoria top</span>
+                    <p style={styles.destaqueTitulo}>{categoriaMaisUsada}</p>
+                    <div style={styles.destaqueRow}>
+                        <span style={{
+                            ...styles.categoriaBadge,
+                            backgroundColor: coresPorCategoria[categoriaMaisUsada] || "#6b7280"
+                        }}>
+                            {lembretes.filter(l => l.categoria === categoriaMaisUsada).length} lembretes
+                        </span>
+                    </div>
+                </div>
+ 
+            </div>
+ 
+            {/* LISTA COMPLETA */}
+            <div style={styles.listaWrapper}>
+                <div style={styles.listaHeader}>
+                    <span style={styles.listaTitulo}>Todos os lembretes</span>
+                    <span style={styles.listaCount}>{lembretes.length}</span>
+                </div>
+ 
+                {listaPrioridade.map((l, i) => {
+                    const status = calcularStatus(l.data_hora_prazo);
+                    const prazo = new Date(l.data_hora_prazo);
+                    return (
+                        <div
+                            key={l.id_lembrete}
+                            className="lembrete-row"
+                            style={{
+                                ...styles.lembreteRow,
+                                animationDelay: `${0.25 + i * 0.04}s`,
+                                borderLeft: `3px solid ${coresPorCategoria[l.categoria] || "#6b7280"}`,
+                            }}
+                        >
+                            {/* Lado esquerdo */}
+                            <div style={styles.lembreteLeft}>
+                                <span style={styles.lembreteTitulo}>{l.titulo}</span>
+                                {l.descricao && (
+                                    <span style={styles.lembreteDesc}>{l.descricao}</span>
+                                )}
+                                <div style={styles.lembreteMeta}>
+                                    <span style={{
+                                        ...styles.categoriaBadge,
+                                        backgroundColor: coresPorCategoria[l.categoria] || "#6b7280",
+                                        fontSize: '9px',
+                                    }}>
+                                        {l.categoria}
+                                    </span>
+                                    <span style={styles.lembreteData}>
+                                        {prazo.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                        {' · '}
+                                        {prazo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                </div>
+                            </div>
+ 
+                            {/* Lado direito */}
+                            <div style={styles.lembreteRight}>
+                                <span style={{
+                                    ...styles.statusBadge,
+                                    color: status.cor,
+                                    borderColor: status.cor,
+                                }}>
+                                    {status.label}
+                                </span>
+                                <span style={{ ...styles.prazoRelativo, color: status.cor }}>
+                                    {formatarPrazo(l.data_hora_prazo)}
+                                </span>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+ 
+const styles = {
+    wrapper: {
+        padding: '24px',
+        background: '#fff',
+        minHeight: '100vh',
+        fontFamily: "'DM Mono', monospace",
+        color: '#111',
+    },
+    loadingWrapper: {
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '40px', justifyContent: 'center',
+    },
+    loadingDot: {
+        width: '8px', height: '8px',
+        borderRadius: '50%', background: '#111',
+    },
+    loadingText: { fontSize: '12px', color: '#999', letterSpacing: '0.1em' },
+    empty: {
+        textAlign: 'center', padding: '60px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
+    },
+    emptyIcon: { fontSize: '32px', color: '#ccc' },
+    emptyText: { fontSize: '13px', color: '#999' },
+ 
+    // Stats
+    statsGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+        gap: '12px',
+        marginBottom: '20px',
+    },
+    statCard: {
+        border: '1.5px solid #e5e5e5',
+        borderRadius: '12px',
+        padding: '20px 16px',
+        display: 'flex', flexDirection: 'column', gap: '4px',
+        background: '#fff',
+        transition: 'border-color 0.2s',
+    },
+    statLabel: { fontSize: '10px', letterSpacing: '0.15em', color: '#999', textTransform: 'uppercase' },
+    statNumber: { fontSize: '36px', fontWeight: '800', lineHeight: 1, color: '#000' },
+    statSub: { fontSize: '11px', color: '#bbb' },
+ 
+    // Destaques
+    destaqueGrid: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '12px',
+        marginBottom: '24px',
+    },
+    destaque: {
+        border: '1.5px solid #e5e5e5',
+        borderRadius: '12px',
+        padding: '18px',
+        display: 'flex', flexDirection: 'column', gap: '8px',
+        background: '#fafafa',
+    },
+    destaqueLabel: { fontSize: '10px', color: '#999', letterSpacing: '0.1em', textTransform: 'uppercase' },
+    destaqueTitulo: { fontSize: '15px', fontWeight: '700', color: '#111', margin: 0 },
+    destaqueRow: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
+    destaqueSub: { fontSize: '11px', color: '#999' },
+ 
+    // Lista
+    listaWrapper: {
+        border: '1.5px solid #e5e5e5',
+        borderRadius: '12px',
+        overflow: 'hidden',
+    },
+    listaHeader: {
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '14px 20px',
+        borderBottom: '1px solid #f0f0f0',
+        background: '#fafafa',
+    },
+    listaTitulo: { fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#555' },
+    listaCount: {
+        fontSize: '10px', background: '#111', color: '#fff',
+        borderRadius: '20px', padding: '2px 10px',
+    },
+    lembreteRow: {
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '16px 20px',
+        borderBottom: '1px solid #f5f5f5',
+        background: '#fff',
+        transition: 'background 0.15s',
+        cursor: 'default',
+        animation: 'fadeUp 0.4s ease both',
+        gap: '12px',
+    },
+    lembreteLeft: { display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0 },
+    lembreteTitulo: { fontSize: '14px', fontWeight: '600', color: '#111', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    lembreteDesc: { fontSize: '12px', color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+    lembreteMeta: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
+    lembreteData: { fontSize: '11px', color: '#bbb' },
+    lembreteRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 },
+ 
+    // Badges
+    categoriaBadge: {
+        fontSize: '10px', fontWeight: '700',
+        color: '#fff', borderRadius: '20px',
+        padding: '2px 8px', letterSpacing: '0.05em',
+        textTransform: 'uppercase', whiteSpace: 'nowrap',
+    },
+    statusBadge: {
+        fontSize: '10px', fontWeight: '700',
+        border: '1px solid',
+        borderRadius: '20px',
+        padding: '2px 8px',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+    },
+    prazoRelativo: {
+        fontSize: '11px', fontWeight: '600',
+    },
+};
