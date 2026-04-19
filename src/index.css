@@ -1,7 +1,14 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+@import "tailwindcss";
 
 .header {
     font-family: "Inter", sans-serif;
 
+}
+
+/* Estilizando Header Menu content */
+
+.menu {
+    background-color: red;
+    width: fit-content;
 }
