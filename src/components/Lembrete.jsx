@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { dbService } from '../services/dbService'
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from '../services/supabase'
-import  FullCalendar  from '@fullcalendar/react'
+import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
@@ -34,95 +34,118 @@ export function AddLembrete() {
             setLoading(false)
         }
     }
-
     return (
-        <>
-            <form onSubmit={handleCriar}>
-                {/* Titulo */}
-                <div>
-                    <label>Título do Lembrete</label>
-                    <input 
-                        type="text"
-                        placeholder='Ex: Marcar Consulta' 
-                        value={titulo}
-                        onChange={e => setTitulo(e.target.value)}
-                        required
-                        autoComplete="off"
-                    />
-                </div>
+        <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-4 sm:p-6 font-sans">
+            <div className="w-full max-w-lg bg-white border border-zinc-200 rounded-2xl shadow-sm p-8">
 
-                {/* Descrição */}
-                <div>
-                    <label>Descrição</label>
-                    <textarea
-                        placeholder='Descreva sobre o lembrete'
-                        value={descricao}
-                        onChange={e => setDescricao(e.target.value)}
-                        rows="3"
-                    />
-                </div>
+                <header className="mb-8">
+                    <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Novo Lembrete</h1>
+                    <p className="text-zinc-500 text-sm mt-1">Preencha os detalhes para organizar sua tarefa.</p>
+                </header>
 
-                {/* Categoria */}
-                <div>
-                    <label>Categoria</label>
-                    <select
-                        value={categoria}
-                        onChange={e => setCategoria(e.target.value)}
-                        required
-                    >
-                        <option value="" disabled>Selecione uma Categoria</option>
-                        <option value="Trabalho">Trabalho</option>
-                        <option value="Estudos">Estudos</option>
-                        <option value="Casa">Casa</option>
-                        <option value="Compras">Compras</option>
-                        <option value="Saude">Saude</option>
-                        <option value="Financas">Finanças</option>
-                        <option value="Lazer">Lazer</option>
-                        <option value="Outros">Outros</option>
-                    </select>
-                </div>
+                <form onSubmit={handleCriar} className="space-y-6">
 
-                {/* Prazo */}
-                <div>
-                    <label>Data e Hora</label>
-                    <input
-                        type="datetime-local" 
-                        value={prazo}
-                        onChange={e => setPrazo(e.target.value)}
-                        required
-                    />
-                </div>
+                    {/* Titulo */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-zinc-700 ml-1">Título do Lembrete</label>
+                        <input
+                            type="text"
+                            placeholder='Ex: Marcar Consulta'
+                            value={titulo}
+                            onChange={e => setTitulo(e.target.value)}
+                            required
+                            autoComplete="off"
+                            className="w-full px-4 py-2.5 bg-white border border-zinc-300 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all"
+                        />
+                    </div>
 
-                {/* Botão Cancelar */}
-                <Link to="/">Cancelar</Link>
+                    {/* Descrição */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-zinc-700 ml-1">Descrição</label>
+                        <textarea
+                            placeholder='Descreva sobre o lembrete'
+                            value={descricao}
+                            onChange={e => setDescricao(e.target.value)}
+                            rows="3"
+                            className="w-full px-4 py-2.5 bg-white border border-zinc-300 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all resize-none"
+                        />
+                    </div>
 
+                    {/* Grid para Categoria e Prazo */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Categoria */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-zinc-700 ml-1">Categoria</label>
+                            <select
+                                value={categoria}
+                                onChange={e => setCategoria(e.target.value)}
+                                required
+                                className="w-full px-4 py-2.5 bg-white border border-zinc-300 rounded-xl text-zinc-900 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all appearance-none cursor-pointer"
+                            >
+                                <option value="" disabled>Selecione</option>
+                                <option value="Trabalho">Trabalho</option>
+                                <option value="Estudos">Estudos</option>
+                                <option value="Casa">Casa</option>
+                                <option value="Compras">Compras</option>
+                                <option value="Saude">Saude</option>
+                                <option value="Financas">Finanças</option>
+                                <option value="Lazer">Lazer</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
 
-                {/* Botão Salvar com Loader */}
-                <button
-                    type='submit'
-                    disabled={loading}
-                >
-                    {loading ? (
-                        <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Criando...
-                        </span>
-                    ) : (
-                        'Criar Lembrete'
-                    )}
-                </button>
-            </form>
-        </>
+                        {/* Prazo */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-zinc-700 ml-1">Data e Hora</label>
+                            <input
+                                type="datetime-local"
+                                value={prazo}
+                                onChange={e => setPrazo(e.target.value)}
+                                required
+                                className="w-full px-4 py-2.5 bg-white border border-zinc-300 rounded-xl text-zinc-900 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all cursor-pointer"
+                            />
+                        </div>
+                    </div>
+
+                    <hr className="border-zinc-100 my-2" />
+
+                    {/* Ações */}
+                    <div className="flex flex-col-reverse sm:flex-row items-center gap-4 pt-2">
+                        <Link
+                            to="/"
+                            className="w-full sm:w-1/3 text-center text-sm font-medium text-zinc-500 hover:text-zinc-800 transition-colors py-2.5"
+                        >
+                            Cancelar
+                        </Link>
+
+                        <button
+                            type='submit'
+                            disabled={loading}
+                            className="w-full sm:w-2/3 bg-black text-white font-medium py-3 rounded-xl hover:bg-zinc-800 active:scale-[0.98] transition-all disabled:bg-zinc-400 disabled:cursor-not-allowed flex items-center justify-center shadow-md shadow-zinc-200"
+                        >
+                            {loading ? (
+                                <span className="flex items-center gap-2">
+                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Criando...
+                                </span>
+                            ) : (
+                                'Criar Lembrete'
+                            )}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     )
 }
 
 
 // Obter Lembrete
 
-export function GetLembrete({idLembrete}) {
+export function GetLembrete({ idLembrete }) {
     const [lembrete, setLembrete] = useState(null) // UseState para esperar pelo objeto
     const [loading, setLoading] = useState(true)
 
@@ -139,7 +162,7 @@ export function GetLembrete({idLembrete}) {
         }
         async function carregarDados() {
             try {
-                const {data: {user}} = await supabase.auth.getUser();
+                const { data: { user } } = await supabase.auth.getUser();
                 setUsuarioLogado(user);
 
                 const dados = await dbService.getLembrete(idLembrete)
@@ -192,22 +215,22 @@ export function GetCalendarLembretes() {
                     const dataFim = new Date(data);
 
                     const coresPorCategoria = {
-                        "Trabalho":   "#3b82f6", // azul
-                        "Casa":    "#22c55e", // verde
-                        "Saude":      "#ef4444", // vermelho
-                        "Estudos":     "#a855f7", // roxo
+                        "Trabalho": "#3b82f6", // azul
+                        "Casa": "#22c55e", // verde
+                        "Saude": "#ef4444", // vermelho
+                        "Estudos": "#a855f7", // roxo
                         "Financas": "#f59e0b", // amarelo
                         "Lazer": "#606c38",
                         "Outros": "#283618",
                     };
 
-    
+
                     // Calcula um fim seguro de 10 minutos para o evento ser válido
                     dataFim.setMinutes(data.getMinutes() + 1);
-                    
+
                     return {
 
-                    
+
                         id: lembrete.id_lembrete,
                         title: lembrete.titulo,
                         backgroundColor: coresPorCategoria[lembrete.categoria] || "#ffff",
@@ -227,10 +250,10 @@ export function GetCalendarLembretes() {
                         }
                     }
                 });
-                
+
                 setEventos(eventosFormatados);
             } catch (error) {
-                    alert("Erro ao carregar calendário " + error.message)
+                alert("Erro ao carregar calendário " + error.message)
             } finally {
                 setLoading(false);
             }
@@ -242,37 +265,37 @@ export function GetCalendarLembretes() {
     // Função: Quando o usuario clica no lembrete
     const handleCliqueEvento = (info) => {
         setModalEvento({
-        titulo: info.event.title,
-        categoria: info.event.extendedProps.categoria,
-        descricao: info.event.extendedProps.descricao,
-        hora: info.event.extendedProps.horaFormatada,
-        cor: info.event.backgroundColor,
-        data: info.event.start.toLocaleDateString('pt-BR', {
-            weekday: 'long',
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-        })
-    });
+            titulo: info.event.title,
+            categoria: info.event.extendedProps.categoria,
+            descricao: info.event.extendedProps.descricao,
+            hora: info.event.extendedProps.horaFormatada,
+            cor: info.event.backgroundColor,
+            data: info.event.start.toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            })
+        });
     }
 
     // Função ver Card do evento 
     const handleVerEvento = useCallback((view) => {
-    return (
-        <div style={{
-            wordBreak: 'break-word',
-            overflowWrap: 'break-word',
-            whiteSpace: 'normal',  // ← adicione isso
-            width: '100%',         // ← e isso
-            backgroundColor: view.event.backgroundColor,
-            borderRadius: '10px',
-            color: 'white',
-            padding: '4px',
-        }}>
-            <p className='font-bold'>{view.event.extendedProps.categoria}</p>
-        </div>
-    );
-    
+        return (
+            <div style={{
+                wordBreak: 'break-word',
+                overflowWrap: 'break-word',
+                whiteSpace: 'normal',  // ← adicione isso
+                width: '100%',         // ← e isso
+                backgroundColor: view.event.backgroundColor,
+                borderRadius: '10px',
+                color: 'white',
+                padding: '4px',
+            }}>
+                <p className='font-bold'>{view.event.extendedProps.categoria}</p>
+            </div>
+        );
+
     }, []); // [] significa que a função nunca muda 
 
     if (loading) {
@@ -281,109 +304,109 @@ export function GetCalendarLembretes() {
 
     return (
         <>
-        {/* Modal */}
-        {modalEvento && (
-        <div
-            onClick={() => setModalEvento(null)}
-            style={{
-            position: 'fixed', inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 1000,
-            backdropFilter: 'blur(4px)',
-            }}
-        >
-            <div
-            onClick={(e) => e.stopPropagation()} // ← impede fechar ao clicar dentro
-            style={{
-                background: '#fff',
-                color: '#000',
-                width: '100%',
-                maxWidth: '400px',
-                borderRadius: '16px',
-                overflow: 'hidden',
-                boxShadow: '0 25px 50px rgba(0,0,0,0.3)',
-            }}
-            >
-            {/* Barra colorida da categoria */}
-            <div style={{ height: '4px', backgroundColor: modalEvento.cor }} />
-
-            <div style={{ padding: '28px' }}>
-                {/* Categoria + fechar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <span style={{
-                    fontSize: '10px',
-                    fontWeight: '700',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    color: '#999',
-                }}>
-                    {modalEvento.categoria}
-                </span>
-                <button
+            {/* Modal */}
+            {modalEvento && (
+                <div
                     onClick={() => setModalEvento(null)}
                     style={{
-                    background: 'none', border: 'none',
-                    fontSize: '20px', cursor: 'pointer',
-                    color: '#999', lineHeight: 1,
+                        position: 'fixed', inset: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        zIndex: 1000,
+                        backdropFilter: 'blur(4px)',
                     }}
                 >
-                    ✕
-                </button>
+                    <div
+                        onClick={(e) => e.stopPropagation()} // ← impede fechar ao clicar dentro
+                        style={{
+                            background: '#fff',
+                            color: '#000',
+                            width: '100%',
+                            maxWidth: '400px',
+                            borderRadius: '16px',
+                            overflow: 'hidden',
+                            boxShadow: '0 25px 50px rgba(0,0,0,0.3)',
+                        }}
+                    >
+                        {/* Barra colorida da categoria */}
+                        <div style={{ height: '4px', backgroundColor: modalEvento.cor }} />
+
+                        <div style={{ padding: '28px' }}>
+                            {/* Categoria + fechar */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <span style={{
+                                    fontSize: '10px',
+                                    fontWeight: '700',
+                                    letterSpacing: '0.15em',
+                                    textTransform: 'uppercase',
+                                    color: '#999',
+                                }}>
+                                    {modalEvento.categoria}
+                                </span>
+                                <button
+                                    onClick={() => setModalEvento(null)}
+                                    style={{
+                                        background: 'none', border: 'none',
+                                        fontSize: '20px', cursor: 'pointer',
+                                        color: '#999', lineHeight: 1,
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            {/* Título */}
+                            <h2 style={{ fontSize: '22px', fontWeight: '800', marginBottom: '8px', lineHeight: 1.2 }}>
+                                {modalEvento.titulo}
+                            </h2>
+
+                            {/* Data e hora */}
+                            <p style={{ fontSize: '13px', color: '#666', marginBottom: '20px', textTransform: 'capitalize' }}>
+                                {modalEvento.data} · {modalEvento.hora}
+                            </p>
+
+                            {/* Divisor */}
+                            <div style={{ height: '1px', background: '#f0f0f0', marginBottom: '20px' }} />
+
+                            {/* Descrição */}
+                            <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.6 }}>
+                                {modalEvento.descricao || "Sem descrição."}
+                            </p>
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{
+                            padding: '16px 28px',
+                            borderTop: '1px solid #f0f0f0',
+                            display: 'flex', justifyContent: 'flex-end'
+                        }}>
+                            <button
+                                onClick={() => setModalEvento(null)}
+                                style={{
+                                    background: '#000', color: '#fff',
+                                    border: 'none', borderRadius: '8px',
+                                    padding: '10px 24px',
+                                    fontSize: '13px', fontWeight: '600',
+                                    cursor: 'pointer',
+                                }}
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
-                {/* Título */}
-                <h2 style={{ fontSize: '22px', fontWeight: '800', marginBottom: '8px', lineHeight: 1.2 }}>
-                {modalEvento.titulo}
-                </h2>
-
-                {/* Data e hora */}
-                <p style={{ fontSize: '13px', color: '#666', marginBottom: '20px', textTransform: 'capitalize' }}>
-                {modalEvento.data} · {modalEvento.hora}
-                </p>
-
-                {/* Divisor */}
-                <div style={{ height: '1px', background: '#f0f0f0', marginBottom: '20px' }} />
-
-                {/* Descrição */}
-                <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.6 }}>
-                {modalEvento.descricao || "Sem descrição."}
-                </p>
-            </div>
-
-            {/* Footer */}
-            <div style={{
-                padding: '16px 28px',
-                borderTop: '1px solid #f0f0f0',
-                display: 'flex', justifyContent: 'flex-end'
-            }}>
-                <button
-                onClick={() => setModalEvento(null)}
-                style={{
-                    background: '#000', color: '#fff',
-                    border: 'none', borderRadius: '8px',
-                    padding: '10px 24px',
-                    fontSize: '13px', fontWeight: '600',
-                    cursor: 'pointer',
+            )}
+            <FullCalendar
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView='dayGridMonth'
+                events={eventos}
+                eventClick={handleCliqueEvento}
+                eventContent={handleVerEvento}
+                locale="pt-br"
+                buttonText={{
+                    today: 'Hoje'
                 }}
-                >
-                Fechar
-                </button>
-            </div>
-            </div>
-        </div>
-        )}
-        <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView='dayGridMonth'
-            events={eventos}
-            eventClick={handleCliqueEvento}
-            eventContent={handleVerEvento}
-            locale="pt-br"
-            buttonText={{
-                today: 'Hoje'
-            }}
-        />
+            />
         </>
     )
 }
@@ -396,67 +419,67 @@ export function GetListaLembretes() {
     const [loading, setLoading] = useState(true);
 
     // ─── NOTIFICAÇÕES ───────────────────────────────────────────
-const notificacoesEnviadas = useRef(new Set()); // guarda IDs já notificados
+    const notificacoesEnviadas = useRef(new Set()); // guarda IDs já notificados
 
-// Pede permissão ao carregar
-useEffect(() => {
-    if ("Notification" in window && Notification.permission === "default") {
-        Notification.requestPermission();
-    }
-}, []);
+    // Pede permissão ao carregar
+    useEffect(() => {
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+    }, []);
 
-// Verifica prazos a cada minuto
-useEffect(() => {
-    if (lembretes.length === 0) return;
+    // Verifica prazos a cada minuto
+    useEffect(() => {
+        if (lembretes.length === 0) return;
 
-    function verificarPrazos() {
-        if (Notification.permission !== "granted") return;
+        function verificarPrazos() {
+            if (Notification.permission !== "granted") return;
 
-        const agora = new Date();
+            const agora = new Date();
 
-        lembretes.forEach((l) => {
-            const prazo = new Date(l.data_hora_prazo);
-            const diffMs = prazo - agora;
-            const diffMin = diffMs / (1000 * 60);
+            lembretes.forEach((l) => {
+                const prazo = new Date(l.data_hora_prazo);
+                const diffMs = prazo - agora;
+                const diffMin = diffMs / (1000 * 60);
 
-            // Notifica se faltar entre 0 e 60 minutos e ainda não notificou
-            const chave = `${l.id_lembrete}-1h`;
-            if (diffMin > 0 && diffMin <= 60 && !notificacoesEnviadas.current.has(chave)) {
-                notificacoesEnviadas.current.add(chave);
-                new Notification("⏰ Lembrete próximo do prazo!", {
-                    body: `"${l.titulo}" vence em ${Math.ceil(diffMin)} minutos.`,
-                    icon: "/favicon.ico",
-                });
-            }
+                // Notifica se faltar entre 0 e 60 minutos e ainda não notificou
+                const chave = `${l.id_lembrete}-1h`;
+                if (diffMin > 0 && diffMin <= 60 && !notificacoesEnviadas.current.has(chave)) {
+                    notificacoesEnviadas.current.add(chave);
+                    new Notification("⏰ Lembrete próximo do prazo!", {
+                        body: `"${l.titulo}" vence em ${Math.ceil(diffMin)} minutos.`,
+                        icon: "/favicon.ico",
+                    });
+                }
 
-            // Notifica se acabou de vencer (última hora)
-            const chaveVencido = `${l.id_lembrete}-vencido`;
-            if (diffMs < 0 && diffMs > -1000 * 60 * 60 && !notificacoesEnviadas.current.has(chaveVencido)) {
-                notificacoesEnviadas.current.add(chaveVencido);
-                new Notification("🔴 Lembrete vencido!", {
-                    body: `"${l.titulo}" passou do prazo.`,
-                    icon: "/favicon.ico",
-                });
-            }
-        });
-    }
+                // Notifica se acabou de vencer (última hora)
+                const chaveVencido = `${l.id_lembrete}-vencido`;
+                if (diffMs < 0 && diffMs > -1000 * 60 * 60 && !notificacoesEnviadas.current.has(chaveVencido)) {
+                    notificacoesEnviadas.current.add(chaveVencido);
+                    new Notification("🔴 Lembrete vencido!", {
+                        body: `"${l.titulo}" passou do prazo.`,
+                        icon: "/favicon.ico",
+                    });
+                }
+            });
+        }
 
-    verificarPrazos(); // roda imediatamente ao carregar
-    const intervalo = setInterval(verificarPrazos, 60 * 1000); // repete a cada 1 min
-    return () => clearInterval(intervalo); // limpa ao desmontar
+        verificarPrazos(); // roda imediatamente ao carregar
+        const intervalo = setInterval(verificarPrazos, 60 * 1000); // repete a cada 1 min
+        return () => clearInterval(intervalo); // limpa ao desmontar
 
-}, [lembretes]); // roda sempre que lembretes mudar
+    }, [lembretes]); // roda sempre que lembretes mudar
 
 
     const coresPorCategoria = {
-        "Trabalho":  "#3b82f6",
-        "Casa":      "#22c55e",
-        "Saude":     "#ef4444",
-        "Estudos":   "#a855f7",
-        "Financas":  "#f59e0b",
-        "Lazer":     "#606c38",
-        "Compras":   "#0ea5e9",
-        "Outros":    "#6b7280",
+        "Trabalho": "#3b82f6",
+        "Casa": "#22c55e",
+        "Saude": "#ef4444",
+        "Estudos": "#a855f7",
+        "Financas": "#f59e0b",
+        "Lazer": "#606c38",
+        "Compras": "#0ea5e9",
+        "Outros": "#6b7280",
     };
 
     const styles = {
@@ -582,13 +605,13 @@ useEffect(() => {
         const diffMs = prazo - agora;
         const diffHoras = diffMs / (1000 * 60 * 60);
         const diffDias = diffMs / (1000 * 60 * 60 * 24);
-    
+
         if (diffMs < 0) return { label: "Vencido", cor: "#ef4444", prioridade: 0 };
         if (diffHoras <= 24) return { label: "Urgente", cor: "#f59e0b", prioridade: 1 };
         if (diffDias <= 7) return { label: "Esta semana", cor: "#3b82f6", prioridade: 2 };
         return { label: "Em dia", cor: "#22c55e", prioridade: 3 };
     }
-    
+
     function formatarPrazo(data_hora_prazo) {
         const prazo = new Date(data_hora_prazo);
         const agora = new Date();
@@ -596,7 +619,7 @@ useEffect(() => {
         const diffDias = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60 * 24));
         const diffHoras = Math.floor(Math.abs(diffMs) / (1000 * 60 * 60));
         const diffMin = Math.floor(Math.abs(diffMs) / (1000 * 60));
-    
+
         if (diffMs < 0) {
             if (diffDias > 0) return `Venceu há ${diffDias}d`;
             if (diffHoras > 0) return `Venceu há ${diffHoras}h`;
@@ -606,7 +629,7 @@ useEffect(() => {
         if (diffHoras > 0) return `Em ${diffHoras}h`;
         return `Em ${diffMin}min`;
     }
- 
+
     useEffect(() => {
         async function carregar() {
             try {
@@ -620,53 +643,53 @@ useEffect(() => {
         }
         carregar();
     }, []);
- 
+
     if (loading) return (
         <div style={styles.loadingWrapper}>
             <div style={styles.loadingDot} className="pulse" />
             <span style={styles.loadingText}>Carregando</span>
         </div>
     );
- 
+
     if (lembretes.length === 0) return (
         <div style={styles.empty}>
             <span style={styles.emptyIcon}>◌</span>
             <p style={styles.emptyText}>Nenhum lembrete ainda.</p>
         </div>
     );
- 
+
     const agora = new Date();
- 
+
     // Derivados
     const ordenadosPorData = [...lembretes].sort((a, b) =>
         new Date(b.data_hora_prazo) - new Date(a.data_hora_prazo)
     );
     const maisRecente = ordenadosPorData[0];
- 
+
     const vencidos = lembretes.filter(l => new Date(l.data_hora_prazo) < agora);
     const emDia = lembretes.filter(l => new Date(l.data_hora_prazo) >= agora);
- 
+
     const maiorPrazo = [...emDia].sort((a, b) =>
         new Date(a.data_hora_prazo) - new Date(b.data_hora_prazo)
     )[0];
- 
+
     const categorias = [...new Set(lembretes.map(l => l.categoria))];
     const categoriaMaisUsada = categorias.sort((a, b) =>
         lembretes.filter(l => l.categoria === b).length -
         lembretes.filter(l => l.categoria === a).length
     )[0];
- 
+
     const urgentes = lembretes.filter(l => {
         const diff = new Date(l.data_hora_prazo) - agora;
         return diff > 0 && diff <= 1000 * 60 * 60 * 24;
     });
- 
+
     // Lista ordenada por status (vencidos primeiro, depois urgentes, etc)
     const listaPrioridade = [...lembretes].sort((a, b) => {
         return calcularStatus(a.data_hora_prazo).prioridade -
-               calcularStatus(b.data_hora_prazo).prioridade;
+            calcularStatus(b.data_hora_prazo).prioridade;
     });
- 
+
     return (
         <div style={styles.wrapper}>
             <style>{`
@@ -686,17 +709,17 @@ useEffect(() => {
                 .lembrete-row:hover { background: #1a1a1a !important; }
                 .pulse { animation: pulse 1.5s ease infinite; }
             `}</style>
- 
+
             {/* STATS GRID */}
             <div style={styles.statsGrid}>
- 
+
                 {/* Total */}
                 <div className="dash-card" style={styles.statCard}>
                     <span style={styles.statLabel}>Total</span>
                     <span style={styles.statNumber}>{lembretes.length}</span>
                     <span style={styles.statSub}>lembretes</span>
                 </div>
- 
+
                 {/* Vencidos */}
                 <div className="dash-card" style={{ ...styles.statCard, borderColor: vencidos.length > 0 ? "#ef4444" : "#e5e5e5" }}>
                     <span style={styles.statLabel}>Vencidos</span>
@@ -705,7 +728,7 @@ useEffect(() => {
                     </span>
                     <span style={styles.statSub}>em atraso</span>
                 </div>
- 
+
                 {/* Urgentes */}
                 <div className="dash-card" style={{ ...styles.statCard, borderColor: urgentes.length > 0 ? "#f59e0b" : "#e5e5e5" }}>
                     <span style={styles.statLabel}>Urgentes</span>
@@ -714,19 +737,19 @@ useEffect(() => {
                     </span>
                     <span style={styles.statSub}>próximas 24h</span>
                 </div>
- 
+
                 {/* Em dia */}
                 <div className="dash-card" style={styles.statCard}>
                     <span style={styles.statLabel}>Em dia</span>
                     <span style={{ ...styles.statNumber, color: "#22c55e" }}>{emDia.length}</span>
                     <span style={styles.statSub}>no prazo</span>
                 </div>
- 
+
             </div>
- 
+
             {/* DESTAQUES */}
             <div style={styles.destaqueGrid}>
- 
+
                 {/* Mais recente */}
                 {maisRecente && (
                     <div className="dash-card" style={styles.destaque}>
@@ -745,7 +768,7 @@ useEffect(() => {
                         </div>
                     </div>
                 )}
- 
+
                 {/* Mais próximo do prazo */}
                 {maiorPrazo && (
                     <div className="dash-card" style={{ ...styles.destaque, borderColor: "#f59e0b" }}>
@@ -764,7 +787,7 @@ useEffect(() => {
                         </div>
                     </div>
                 )}
- 
+
                 {/* Categoria mais usada */}
                 <div className="dash-card" style={styles.destaque}>
                     <span style={styles.destaqueLabel}>◈ Categoria top</span>
@@ -778,16 +801,16 @@ useEffect(() => {
                         </span>
                     </div>
                 </div>
- 
+
             </div>
- 
+
             {/* LISTA COMPLETA */}
             <div style={styles.listaWrapper}>
                 <div style={styles.listaHeader}>
                     <span style={styles.listaTitulo}>Todos os lembretes</span>
                     <span style={styles.listaCount}>{lembretes.length}</span>
                 </div>
- 
+
                 {listaPrioridade.map((l, i) => {
                     const status = calcularStatus(l.data_hora_prazo);
                     const prazo = new Date(l.data_hora_prazo);
@@ -822,7 +845,7 @@ useEffect(() => {
                                     </span>
                                 </div>
                             </div>
- 
+
                             {/* Lado direito */}
                             <div style={styles.lembreteRight}>
                                 <span style={{
@@ -843,4 +866,4 @@ useEffect(() => {
         </div>
     );
 }
- 
+
