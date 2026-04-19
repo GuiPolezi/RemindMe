@@ -179,6 +179,7 @@ export function GetLembrete({idLembrete}) {
 export function GetCalendarLembretes() {
     const [eventos, setEventos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [modalEvento, setModalEvento] = useState(null);
 
     useEffect(() => {
         async function carregarLembretes() {
@@ -240,9 +241,19 @@ export function GetCalendarLembretes() {
 
     // Função: Quando o usuario clica no lembrete
     const handleCliqueEvento = (info) => {
-        alert(`Você clicou no lembrete: ${info.event.title} ${info.event.extendedProps.categoria}`);
-        // Daria para redirecionar para página de edição aqui
-        // Navigate
+        setModalEvento({
+        titulo: info.event.title,
+        categoria: info.event.extendedProps.categoria,
+        descricao: info.event.extendedProps.descricao,
+        hora: info.event.extendedProps.horaFormatada,
+        cor: info.event.backgroundColor,
+        data: info.event.start.toLocaleDateString('pt-BR', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        })
+    });
     }
 
     // Função ver Card do evento 
@@ -270,6 +281,98 @@ export function GetCalendarLembretes() {
 
     return (
         <>
+        {/* Modal */}
+        {modalEvento && (
+        <div
+            onClick={() => setModalEvento(null)}
+            style={{
+            position: 'fixed', inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 1000,
+            backdropFilter: 'blur(4px)',
+            }}
+        >
+            <div
+            onClick={(e) => e.stopPropagation()} // ← impede fechar ao clicar dentro
+            style={{
+                background: '#fff',
+                color: '#000',
+                width: '100%',
+                maxWidth: '400px',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.3)',
+            }}
+            >
+            {/* Barra colorida da categoria */}
+            <div style={{ height: '4px', backgroundColor: modalEvento.cor }} />
+
+            <div style={{ padding: '28px' }}>
+                {/* Categoria + fechar */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <span style={{
+                    fontSize: '10px',
+                    fontWeight: '700',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    color: '#999',
+                }}>
+                    {modalEvento.categoria}
+                </span>
+                <button
+                    onClick={() => setModalEvento(null)}
+                    style={{
+                    background: 'none', border: 'none',
+                    fontSize: '20px', cursor: 'pointer',
+                    color: '#999', lineHeight: 1,
+                    }}
+                >
+                    ✕
+                </button>
+                </div>
+
+                {/* Título */}
+                <h2 style={{ fontSize: '22px', fontWeight: '800', marginBottom: '8px', lineHeight: 1.2 }}>
+                {modalEvento.titulo}
+                </h2>
+
+                {/* Data e hora */}
+                <p style={{ fontSize: '13px', color: '#666', marginBottom: '20px', textTransform: 'capitalize' }}>
+                {modalEvento.data} · {modalEvento.hora}
+                </p>
+
+                {/* Divisor */}
+                <div style={{ height: '1px', background: '#f0f0f0', marginBottom: '20px' }} />
+
+                {/* Descrição */}
+                <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.6 }}>
+                {modalEvento.descricao || "Sem descrição."}
+                </p>
+            </div>
+
+            {/* Footer */}
+            <div style={{
+                padding: '16px 28px',
+                borderTop: '1px solid #f0f0f0',
+                display: 'flex', justifyContent: 'flex-end'
+            }}>
+                <button
+                onClick={() => setModalEvento(null)}
+                style={{
+                    background: '#000', color: '#fff',
+                    border: 'none', borderRadius: '8px',
+                    padding: '10px 24px',
+                    fontSize: '13px', fontWeight: '600',
+                    cursor: 'pointer',
+                }}
+                >
+                Fechar
+                </button>
+            </div>
+            </div>
+        </div>
+        )}
         <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView='dayGridMonth'
