@@ -265,3 +265,9 @@ export function GetCalendarLembretes() {
         </>
     )
 }
+
+export function GetListaLembretes() {
+    return (
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit, quibusdam?</p>
+    )
+}

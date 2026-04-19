@@ -1,4 +1,4 @@
-import { AddLembrete, GetLembrete, GetCalendarLembretes } from '../components/Lembrete'
+import { AddLembrete, GetLembrete, GetCalendarLembretes, GetListaLembretes } from '../components/Lembrete'
 import { useState, useRef, useEffect } from "react";
 import { authService } from '../services/authService'
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +14,7 @@ const menuItems = [
 ];
 
 
-export default function MenuButton() {
+export function MenuButton() {
   const [open, setOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const navigate = useNavigate();
@@ -102,6 +102,43 @@ export default function MenuButton() {
   );
 }
 
+export function Navegacao() {
+    const [aba, setAba] = useState("calendario");
+
+    return (
+        <div>
+            {/* Navegação */}
+            <nav className='flex'>
+                <button
+                    onClick={() => setAba("calendario")}
+                    
+                >
+                    Calendário
+                </button>
+                <button
+                    onClick={() => setAba("lista")}
+                    
+                >
+                    Lista
+                </button>
+            </nav>
+
+            {/* Conteúdo */}
+            {aba === "calendario" &&
+                <div>
+                    <GetCalendarLembretes />
+                </div>
+            }
+
+            {aba === "lista" && 
+                <div>
+                    <GetListaLembretes />
+                </div>
+            }
+        </div>
+    )
+}
+
 export function Home() {
     const midRef = useRef(null);
 
@@ -151,7 +188,7 @@ export function Home() {
             </section>
 
             <section className='calendar p-5 mt-15' id='calendar'>
-                <GetCalendarLembretes />
+                <Navegacao />
             </section>
 
         </>
