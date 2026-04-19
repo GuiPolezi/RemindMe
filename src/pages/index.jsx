@@ -5,7 +5,16 @@ import { AddLembrete, GetLembrete, GetCalendarLembretes } from '../components/Le
 export function Home() {
     return (
         <>
-            <h1>Hello World</h1>
+            <section className='Header'>
+                <div className="grid grid-cols-2">
+                    <div className="col-span-1 bg-gray-500">
+                        <h1>RemindMe</h1>
+                    </div>
+                    <div className="col-span-1">
+                        <p>MENU</p>
+                    </div>
+                </div>
+            </section>
             <Logout />
             <AddLembrete />
             {/*
