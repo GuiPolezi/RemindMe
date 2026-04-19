@@ -25,6 +25,7 @@ function App() {
 
     if (loading) return null // ou um spinner se preferir
 
+
   return (
     <AppRoutes session={session} />
   )
