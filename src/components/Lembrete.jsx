@@ -71,14 +71,14 @@ export function AddLembrete() {
                         required
                     >
                         <option value="" disabled>Selecione uma Categoria</option>
-                        <option value="trabalho">Trabalho</option>
-                        <option value="estudos">Estudos</option>
-                        <option value="casa">Casa</option>
-                        <option value="compras">Compras</option>
-                        <option value="saude">Saude</option>
-                        <option value="financas">Finanças</option>
-                        <option value="lazer">Lazer</option>
-                        <option value="outros">Outros</option>
+                        <option value="Trabalho">Trabalho</option>
+                        <option value="Estudos">Estudos</option>
+                        <option value="Casa">Casa</option>
+                        <option value="Compras">Compras</option>
+                        <option value="Saude">Saude</option>
+                        <option value="Financas">Finanças</option>
+                        <option value="Lazer">Lazer</option>
+                        <option value="Outros">Outros</option>
                     </select>
                 </div>
 
@@ -189,6 +189,15 @@ export function GetCalendarLembretes() {
                 const eventosFormatados = dadosLembretes.map((lembrete) => {
                     const data = new Date(lembrete.data_hora_prazo);
                     const dataFim = new Date(data);
+
+                    const coresPorCategoria = {
+                        "Trabalho":   "#3b82f6", // azul
+                        "Pessoal":    "#22c55e", // verde
+                        "Saúde":      "#ef4444", // vermelho
+                        "Estudo":     "#a855f7", // roxo
+                        "Financeiro": "#f59e0b", // amarelo
+                    };
+
     
                     // Calcula um fim seguro de 10 minutos para o evento ser válido
                     dataFim.setMinutes(data.getMinutes() + 1);
@@ -198,6 +207,7 @@ export function GetCalendarLembretes() {
                     
                         id: lembrete.id_lembrete,
                         title: lembrete.titulo,
+                        backgroundColor: coresPorCategoria[lembrete.categoria] || "#ffff",
                         start: lembrete.data_hora_prazo,
                         // força o fim ser igual ao inicio para a duração ser zero
                         end: dataFim,
@@ -236,13 +246,17 @@ export function GetCalendarLembretes() {
     // Função ver Card do evento 
     const handleVerEvento = useCallback((view) => {
     return (
-        <div className='flex' style={{
+        <div style={{
             wordBreak: 'break-word',
             overflowWrap: 'break-word',
             whiteSpace: 'normal',  // ← adicione isso
             width: '100%',         // ← e isso
+            backgroundColor: view.event.backgroundColor,
+            borderRadius: '10px',
+            color: 'black',
+            padding: '2px',
         }}>
-            <p>{view.event.extendedProps.horaFormatada} - {view.event.extendedProps.categoria}</p>
+            <p className='font-bold'>{view.event.extendedProps.categoria}</p>
         </div>
     );
     
