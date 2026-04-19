@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { dbService } from '../services/dbService'
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from '../services/supabase'
@@ -47,6 +47,7 @@ export function AddLembrete() {
                         value={titulo}
                         onChange={e => setTitulo(e.target.value)}
                         required
+                        autoComplete="off"
                     />
                 </div>
 
@@ -187,13 +188,22 @@ export function GetCalendarLembretes() {
 
                 const eventosFormatados = dadosLembretes.map((lembrete) => {
                     const data = new Date(lembrete.data_hora_prazo);
-
+                    const dataFim = new Date(data);
+    
+                    // Calcula um fim seguro de 10 minutos para o evento ser válido
+                    dataFim.setMinutes(data.getMinutes() + 1);
+                    
                     return {
 
                     
                         id: lembrete.id_lembrete,
                         title: lembrete.titulo,
-                        date: lembrete.data_hora_prazo, // O FullCalendar lê ISO Strings
+                        start: lembrete.data_hora_prazo,
+                        // força o fim ser igual ao inicio para a duração ser zero
+                        end: dataFim,
+                        // Garante que o calendário não o trate como o dia inteiro
+                        allDay: false,
+                        //date: lembrete.data_hora_prazo, // O FullCalendar lê ISO Strings
                         extendedProps: { // Guardando dados extras
                             categoria: lembrete.categoria,
                             descricao: lembrete.descricao,
@@ -224,26 +234,16 @@ export function GetCalendarLembretes() {
     }
 
     // Função ver Card do evento
-    const handleVerEvento = (view) => {
-
-        const data = view.event.start;
-
-        const hora = data?.toLocaleTimeString('pt-BR', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-        return (
-            <div style={{ padding: '2px' }}>
-            <div style={{ fontWeight: 'bold' }}>
-                {view.event.title}
-            </div>
-            <div style={{ fontSize: '10px', color: 'gray' }}>
-                {view.event.extendedProps.categoria}
-                <strong>{view.event.extendedProps.horaFormatada}</strong>
+    const handleVerEvento = useCallback((view) => {
+    return (
+        <div style={{ padding: '2px' }}>
+            <div style={{ fontWeight: 'bold' }}>{view.event.title}</div>
+            <div style={{ fontSize: '10px', color: 'red' }}>
+                {view.event.extendedProps.categoria} <strong>{view.event.extendedProps.horaFormatada}</strong>
             </div>
         </div>
-        )
-    }
+    );
+}, []); // [] significa que a função nunca muda
 
     if (loading) {
         return <p>Carregando calendário</p>;
