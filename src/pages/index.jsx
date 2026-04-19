@@ -2,7 +2,7 @@ import { AddLembrete, GetLembrete, GetCalendarLembretes } from '../components/Le
 import { useState, useRef, useEffect } from "react";
 import { authService } from '../services/authService'
 import { useNavigate } from 'react-router-dom';
-
+import gsap from "gsap";
 
 
 const menuItems = [
@@ -95,13 +95,46 @@ export default function MenuButton() {
 }
 
 export function Home() {
-   
+    const midRef = useRef(null);
+
+    useEffect(() => {
+        gsap.set(midRef.current, {
+            width: 0,
+            opacity: 0,
+            overflow: "hidden",
+            display: "inline-block",
+            whiteSpace: "nowrap",
+        });
+    }, []);
+
+    function handleMouseEnter() {
+        gsap.to(midRef.current, {
+            width: "auto",
+            opacity: 1,
+            duration: 0.6,
+            ease: "power3.out",
+        });
+    }
+
+    function handleMouseLeave() {
+        gsap.to(midRef.current, {
+            width: 0,
+            opacity: 0,
+            duration: 0.4,
+            ease: "power2.in",
+        });
+    }
     return (
         <>
             <section className='header p-5'>
                 <div className="grid grid-cols-2">
                     <div className="col-span-2 sm:col-span-1 bg-gray-500">
-                        <h1 className='text-7xl font-bold'>RemindME</h1>
+                        <h1 className='text-7xl font-bold' style={{ cursor: "default", display: "inline-flex", alignItems: "baseline" }}
+                             onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+                            <span>R</span>
+                            <span ref={midRef}>emind</span>
+                            <span>ME</span>
+                        </h1>
                     </div>
                     <div className="col-span-2 sm:col-span-1 self-end flex justify-center sm:justify-end">
                        <MenuButton />
