@@ -108,11 +108,16 @@ export function Navegacao() {
     return (
         <div>
             {/* Navegação */}
-            <nav className='flex'>
+            <nav className='flex gap-5'>
                 <button className='nav'
                     onClick={() => setAba("calendario")}
                     style={{
                       fontWeight: aba === "calendario" ? "bold" : "normal",
+                      backgroundColor: aba === "calendario" ? "#111" : "white",
+                      padding:  aba === "calendario" ? "10px" : "0px",
+                      color: aba === "calendario" ? "white" : "gray",
+                      borderTopLeftRadius: aba === "calendario" ? "20px" : "0px",
+                      borderTopRightRadius: aba === "calendario" ? "20px" : "0px",
                     }}
                 >
                     Calendário
@@ -121,7 +126,11 @@ export function Navegacao() {
                     onClick={() => setAba("lista")}
                     style={{
                       fontWeight: aba === "lista" ? "bold" : "normal",
-                      
+                      backgroundColor: aba === "lista" ? "#111" : "white",
+                      padding:  aba === "lista" ? "10px" : "0px",
+                      color: aba === "lista" ? "white" : "gray",
+                      borderTopLeftRadius: aba === "lista" ? "20px" : "0px",
+                      borderTopRightRadius: aba === "lista" ? "20px" : "0px",
                     }}
                 >
                     Lista

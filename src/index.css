@@ -235,7 +235,8 @@
 .nav {
       background: "none";
       cursor: "pointer";
-      font-size: 30px;
+      font-size: 25px;
+      color: gray
 }
 /* Estilizando Navegação: Calendar */
 
@@ -243,4 +244,111 @@
     color: white;
     background-color: #111;
     padding: 10px;
+}
+
+
+
+/* Todas as Variaveis do fullcalendar */
+/* Fundo do header */
+.fc .fc-toolbar {
+  background: #111;
+  padding: 12px;
+}
+
+/* Botões (Hoje, anterior, próximo) */
+.fc .fc-button {
+  background: transparent !important;
+  border: 1px solid #333 !important;
+  color: #f0f0f0 !important;
+  border-radius: 0 !important;
+  font-family: 'DM Mono', monospace !important;
+}
+
+.fc .fc-button:hover {
+  background: #f0f0f0 !important;
+  color: #000 !important;
+}
+
+/* Botão ativo */
+.fc .fc-button-active {
+  background: #f0f0f0 !important;
+  color: #000 !important;
+}
+
+/* Título do mês */
+.fc .fc-toolbar-title {
+  color: #f0f0f0;
+  font-size: 1.2rem;
+  font-family: 'Syne', sans-serif;
+}
+
+/* Fundo geral */
+.fc {
+  background: #0a0a0a;
+  color: #f0f0f0;
+}
+
+/* Bordas da grade */
+.fc .fc-scrollgrid {
+  border-color: #222 !important;
+}
+
+.fc td, .fc th {
+  border-color: #222 !important;
+}
+
+/* Cabeçalho dos dias (Dom, Seg...) */
+.fc .fc-col-header-cell {
+  background: #111;
+  padding: 8px 0;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #555;
+}
+
+/* Número do dia */
+.fc .fc-daygrid-day-number {
+  color: #666;
+  font-size: 12px;
+  padding: 6px;
+}
+
+/* Dia de hoje */
+.fc .fc-day-today {
+  background: #1a1a1a !important;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  color: #f0f0f0;
+  font-weight: bold;
+}
+
+/* Hover nos dias */
+.fc .fc-daygrid-day:hover {
+  background: #141414;
+}
+
+.fc .fc-event {
+  background: #f0f0f0 !important;
+  border: none !important;
+  color: #000 !important;
+  border-radius: 0 !important;
+  font-size: 11px;
+  padding: 2px 6px;
+}
+
+.fc .fc-event:hover {
+  background: #ccc !important;
+  cursor: pointer;
+}
+
+:root {
+  --fc-border-color: #222;
+  --fc-today-bg-color: #1a1a1a;
+  --fc-event-bg-color: #f0f0f0;
+  --fc-event-border-color: transparent;
+  --fc-event-text-color: #000;
+  --fc-page-bg-color: #0a0a0a;
+  --fc-neutral-bg-color: #111;
+  --fc-list-event-hover-bg-color: #1a1a1a;
 }
