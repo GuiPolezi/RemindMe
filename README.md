@@ -1,16 +1,80 @@
-# React + Vite
+# RemindMe
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+RemindMe is a simple system that allows users to create reminders that are saved directly into a calendar.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+* Create reminders easily
+* Store reminders in a calendar
+* Simple and intuitive usage
+* Helps users stay organized and never miss important tasks
 
-## React Compiler
+## 📦 Installation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Follow the steps below to clone and run the project locally:
 
-## Expanding the ESLint configuration
+### 1. Clone the repository
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+bash
+git clone https://github.com/GuiPolezi/RemindMe.git
+
+
+### 2. Navigate to the project folder
+
+bash
+cd RemindMe
+
+
+### 3. Install dependencies
+
+> Adjust the command below depending on the technology used in your project
+
+For Node.js:
+
+bash
+npm install
+
+
+For Python:
+
+bash
+pip install -r requirements.txt
+
+
+For Java (Maven):
+
+bash
+mvn install
+
+
+## ▶️ Running the project
+
+After installing dependencies, run the project with:
+
+bash
+npm start
+
+
+or
+
+bash
+python main.py
+
+
+(Update this section according to your project setup)
+
+## 📖 About the System
+
+RemindMe is a system designed to help users manage their tasks and commitments efficiently.
+
+The application allows users to create reminders that are automatically stored in a calendar. This ensures that important events, deadlines, and daily tasks are organized and easily accessible in one place.
+
+By integrating reminders with a calendar, the system provides a clear and structured view of upcoming activities, helping users stay productive and organized.
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+## 📄 License
+
+This project is licensed under the MIT License.
