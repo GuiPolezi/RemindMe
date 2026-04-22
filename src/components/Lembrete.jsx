@@ -459,7 +459,7 @@ export function GetCalendarLembretes() {
                             <div style={{ height: '1px', background: '#f0f0f0', marginBottom: '20px' }} />
 
                             {/* Descrição */}
-                            <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.6 }}>
+                            <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                                 {modalEvento.descricao || "Sem descrição."}
                             </p>
                         </div>
@@ -857,7 +857,7 @@ export function GetListaLembretes() {
                                     <div style={styles.lembreteContent}>
                                         <div style={styles.lembreteMain}>
                                             <span style={styles.lembreteTitulo}>{l.titulo}</span>
-                                            <span style={styles.lembreteDesc}> {l.descricao}</span>
+                                            <span style={{...styles.lembreteDesc, whiteSpace: 'pre-wrap'}}> {l.descricao}</span>
                                         </div>
 
                                         <div style={styles.lembreteMeta}>
