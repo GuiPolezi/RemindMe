@@ -83,13 +83,10 @@ export function AddLembrete() {
                                 className="w-full px-4 py-2.5 bg-white border border-zinc-300 rounded-xl text-zinc-900 focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all appearance-none cursor-pointer"
                             >
                                 <option value="" disabled>Selecione</option>
-                                <option value="Trabalho">Trabalho</option>
+                                <option value="Licença Sistema">Licença Sistema</option>
                                 <option value="Estudos">Estudos</option>
-                                <option value="Casa">Casa</option>
-                                <option value="Compras">Compras</option>
-                                <option value="Saude">Saude</option>
-                                <option value="Financas">Finanças</option>
-                                <option value="Lazer">Lazer</option>
+                                <option value="Certificado">Certificado</option>
+                                <option value="Compromisso">Compromisso</option>
                                 <option value="Outros">Outros</option>
                             </select>
                         </div>
@@ -215,15 +212,12 @@ export function GetCalendarLembretes() {
                     const dataFim = new Date(data);
 
                     const coresPorCategoria = {
-                        "Trabalho": "#3b82f6", // azul
-                        "Casa": "#22c55e", // verde
-                        "Saude": "#ef4444", // vermelho
-                        "Estudos": "#a855f7", // roxo
-                        "Financas": "#f59e0b", // amarelo
-                        "Lazer": "#606c38",
-                        "Outros": "#283618",
+                        "Licença Sistema": "#3b82f6", // azul
+                        "Certificado": "#22c55e", // verde
+                        "Compromisso": "#ef4444", // vermelho
+                        "Estudos": "#55c9f7", // roxo
+                        "Outros": "#f59e0b", // amarelo
                     };
-
 
                     // Calcula um fim seguro de 10 minutos para o evento ser válido
                     dataFim.setMinutes(data.getMinutes() + 1);
@@ -282,15 +276,17 @@ export function GetCalendarLembretes() {
     // Função ver Card do evento 
     const handleVerEvento = useCallback((view) => {
         return (
-            <div style={{
+            <div className='event-const' style={{
                 wordBreak: 'break-word',
                 overflowWrap: 'break-word',
                 whiteSpace: 'normal',  // ← adicione isso
                 width: '100%',         // ← e isso
                 backgroundColor: view.event.backgroundColor,
                 borderRadius: '10px',
+                boxShadow:'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
                 color: 'white',
                 padding: '4px',
+                
             }}>
                 <p className='font-bold'>{view.event.extendedProps.categoria}</p>
             </div>
