@@ -382,6 +382,7 @@ export function GetCalendarLembretes() {
 
             }}>
                 <p className='font-bold'>{view.event.extendedProps.categoria}</p>
+                <p style={{fontSize: '12px'}}>{view.event.title}</p>
             </div>
         );
 
