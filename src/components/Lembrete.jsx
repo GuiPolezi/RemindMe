@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { dbService } from '../services/dbService'
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from '../services/supabase'
@@ -200,7 +200,9 @@ export function GetCalendarLembretes() {
     const [eventos, setEventos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalEvento, setModalEvento] = useState(null);
-
+    
+    // Estados para dias expandidos
+    const [ diasExpandidos, setDiasExpandidos] = useState({})
     useEffect(() => {
         async function carregarLembretes() {
             try {
@@ -256,6 +258,41 @@ export function GetCalendarLembretes() {
         carregarLembretes();
     }, []);
 
+    // Agrupando eventos por dia (chave: "yyyy-mm-dd")
+    const eventosPorDia = useMemo(() => {
+        const mapa = {};
+        eventos.forEach(ev => {
+            const chave = ev.start.slice(0, 10);
+            if (!mapa[chave]) mapa[chave] = [];
+            mapa[chave].push(ev);
+        })
+        return mapa;
+    }, [eventos])
+
+    const toggleDia = useCallback((chave) => {
+        setDiasExpandidos(prev => ({
+            ...prev,
+            [chave]: !prev[chave]
+        }))
+
+    }, []);
+
+    // Eventos filtrados com base nos dias expandidos
+    const eventosFiltrados = useMemo(() => {
+        const LIMITE = 3;
+        return eventos.filter(ev => {
+            const chave = ev.start.slice(0, 10);
+            const eventosNoDia = eventosPorDia[chave] || [];
+            
+            // Se o dia não está expandido e tem mais de 3, mostra só os 3 primeiros
+            if (!diasExpandidos[chave] && eventosNoDia.length > LIMITE) {
+                const index = eventosNoDia.findIndex(e => e.id === ev.id);
+                return index < LIMITE; // só passa os 3 primeiros
+            }
+            return true; // dia expandido ou com <= 3 eventos: mostra tudo
+        });
+    }, [eventos, eventosPorDia, diasExpandidos]);
+
     // Função: Quando o usuario clica no lembrete
     const handleCliqueEvento = (info) => {
         setModalEvento({
@@ -272,6 +309,62 @@ export function GetCalendarLembretes() {
             })
         });
     }
+
+    // Renderiza o conteúdo de cada célula de dia
+    const renderDayCellContent = useCallback((arg) => {
+        // Chave do dia no formato "YYYY-MM-DD"
+        const chave = arg.date.toISOString().slice(0, 10);
+        const eventosNoDia = eventosPorDia[chave] || [];
+        const LIMITE = 3;
+        const temMais = eventosNoDia.length > LIMITE;
+        const expandido = diasExpandidos[chave];
+        const quantidadeOculta = eventosNoDia.length - LIMITE;
+
+        return (
+            <div style={{ width: '100%' }}>
+                {/* Número do dia (o FullCalendar já renderiza, mas podemos personalizar) */}
+                <div style={{ textAlign: 'right', fontSize: '12px', marginBottom: '2px' }}>
+                    {arg.dayNumberText}
+                </div>
+
+                {/* Botão accordion — só aparece se tiver mais de 3 */}
+                {temMais && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation(); // impede abrir modal ao clicar no botão
+                            toggleDia(chave);
+                        }}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            background: 'none',
+                            border: 'none',
+                            fontSize: '10px',
+                            color: '#6b7280',
+                            cursor: 'pointer',
+                            padding: '1px 0',
+                            marginTop: '2px',
+                            fontWeight: '600',
+                        }}
+                    >
+                        <span
+                            style={{
+                                display: 'inline-block',
+                                transition: 'transform 0.2s',
+                                transform: expandido ? 'rotate(180deg)' : 'rotate(0deg)',
+                                fontSize: '8px',
+                            }}
+                        >
+                            ▼
+                        </span>
+                        {expandido ? 'ver menos' : `+${quantidadeOculta} mais`}
+                    </button>
+                )}
+            </div>
+        );
+    }, [eventosPorDia, diasExpandidos, toggleDia]);
+
 
     // Função ver Card do evento 
     const handleVerEvento = useCallback((view) => {
@@ -395,9 +488,10 @@ export function GetCalendarLembretes() {
             <FullCalendar
                 plugins={[dayGridPlugin, interactionPlugin]}
                 initialView='dayGridMonth'
-                events={eventos}
+                events={eventosFiltrados}
                 eventClick={handleCliqueEvento}
                 eventContent={handleVerEvento}
+                dayCellContent={renderDayCellContent} // Renderiza botão accordion
                 locale="pt-br"
                 buttonText={{
                     today: 'Hoje'
