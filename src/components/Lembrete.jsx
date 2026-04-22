@@ -283,10 +283,10 @@ export function GetCalendarLembretes() {
                 width: '100%',         // ← e isso
                 backgroundColor: view.event.backgroundColor,
                 borderRadius: '10px',
-                boxShadow:'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
+                boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
                 color: 'white',
                 padding: '4px',
-                
+
             }}>
                 <p className='font-bold'>{view.event.extendedProps.categoria}</p>
             </div>
@@ -478,121 +478,110 @@ export function GetListaLembretes() {
         "Outros": "#6b7280",
     };
 
+    // Componente auxiliar para os cards de estatística
+    const StatCard = ({ label, value, sub, color, delay, glow }) => (
+        <div className="dash-card" style={{ ...styles.statCard, animationDelay: delay }}>
+            <div style={{ ...styles.statDecorator, background: color, boxShadow: glow ? `0 0 15px ${color}` : 'none' }} />
+            <span style={styles.statLabel}>{label}</span>
+            <span style={{ ...styles.statNumber, color: glow ? color : '#fff' }}>{value}</span>
+            <span style={styles.statSub}>{sub}</span>
+        </div>
+    );
+
     const styles = {
         wrapper: {
             padding: '24px',
-            background: '#0a0a0a',       // ← fundo escuro
+            backgroundColor: '#0a0a0b', // Fundo ultra dark
+            color: '#e2e8f0',
             minHeight: '100vh',
-            fontFamily: "'DM Mono', monospace",
-            color: '#f0f0f0',            // ← texto claro
+            fontFamily: "'Inter', sans-serif",
         },
-        loadingWrapper: {
-            display: 'flex', alignItems: 'center', gap: '10px',
-            padding: '40px', justifyContent: 'center',
-        },
-        loadingDot: {
-            width: '8px', height: '8px',
-            borderRadius: '50%', background: '#f0f0f0', // ← claro
-        },
-        loadingText: { fontSize: '12px', color: '#555', letterSpacing: '0.1em' },
-        empty: {
-            textAlign: 'center', padding: '60px',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
-        },
-        emptyIcon: { fontSize: '32px', color: '#333' },
-        emptyText: { fontSize: '13px', color: '#555' },
-
-        // Stats
         statsGrid: {
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-            gap: '12px',
-            marginBottom: '20px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '16px',
+            marginBottom: '32px',
         },
         statCard: {
-            border: '1.5px solid #222',  // ← borda escura
-            borderRadius: '12px',
-            padding: '20px 16px',
-            display: 'flex', flexDirection: 'column', gap: '4px',
-            background: '#111',          // ← card escuro
-            transition: 'border-color 0.2s',
-        },
-        statLabel: { fontSize: '10px', letterSpacing: '0.15em', color: '#555', textTransform: 'uppercase' },
-        statNumber: { fontSize: '36px', fontWeight: '800', lineHeight: 1, color: '#f0f0f0' }, // ← claro
-        statSub: { fontSize: '11px', color: '#444' },
-
-        // Destaques
-        destaqueGrid: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '12px',
-            marginBottom: '24px',
-        },
-        destaque: {
-            border: '1.5px solid #222',  // ← borda escura
-            borderRadius: '12px',
-            padding: '18px',
-            display: 'flex', flexDirection: 'column', gap: '8px',
-            background: '#111',          // ← card escuro
-        },
-        destaqueLabel: { fontSize: '10px', color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase' },
-        destaqueTitulo: { fontSize: '15px', fontWeight: '700', color: '#f0f0f0', margin: 0 }, // ← claro
-        destaqueRow: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
-        destaqueSub: { fontSize: '11px', color: '#555' },
-
-        // Lista
-        listaWrapper: {
-            border: '1.5px solid #222',  // ← borda escura
-            borderRadius: '12px',
+            background: '#161618',
+            padding: '20px',
+            borderRadius: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'relative',
             overflow: 'hidden',
         },
-        listaHeader: {
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '14px 20px',
-            borderBottom: '1px solid #1a1a1a',
-            background: '#111',          // ← header escuro
+        statDecorator: {
+            position: 'absolute',
+            top: 0, right: 0, bottom: 0,
+            width: '4px',
         },
-        listaTitulo: { fontSize: '11px', fontWeight: '700', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#555' },
-        listaCount: {
-            fontSize: '10px', background: '#f0f0f0', color: '#000', // ← invertido
-            borderRadius: '20px', padding: '2px 10px',
-        },
-        lembreteRow: {
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '16px 20px',
-            borderBottom: '1px solid #1a1a1a',
-            background: '#111',          // ← row escuro
-            transition: 'background 0.15s',
-            cursor: 'default',
-            animation: 'fadeUp 0.4s ease both',
-            gap: '12px',
-        },
-        lembreteLeft: { display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: 0 },
-        lembreteTitulo: { fontSize: '14px', fontWeight: '600', color: '#f0f0f0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, // ← claro
-        lembreteDesc: { fontSize: '12px', color: '#555', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
-        lembreteMeta: { display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' },
-        lembreteData: { fontSize: '11px', color: '#444' },
-        lembreteRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 },
+        statLabel: { fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' },
+        statNumber: { fontSize: '32px', fontWeight: 800, margin: '8px 0' },
+        statSub: { fontSize: '12px', color: '#64748b' },
 
-        // Badges
-        categoriaBadge: {
-            fontSize: '10px', fontWeight: '700',
-            color: '#fff', borderRadius: '20px',
-            padding: '2px 8px', letterSpacing: '0.05em',
-            textTransform: 'uppercase', whiteSpace: 'nowrap',
+        mainLayout: {
+            display: 'grid',
+            gridTemplateColumns: '300px 1fr',
+            gap: '24px',
         },
-        statusBadge: {
-            fontSize: '10px', fontWeight: '700',
-            border: '1px solid',
+        sectionTitle: {
+            fontSize: '18px',
+            fontWeight: 700,
+            marginBottom: '16px',
+            color: '#f8fafc',
+        },
+        destaque: {
+            background: '#161618',
+            padding: '20px',
+            borderRadius: '12px',
+            marginBottom: '16px',
+        },
+        destaqueLabel: { fontSize: '10px', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '8px' },
+        destaqueTitulo: { fontSize: '16px', fontWeight: 600, margin: '0 0 12px 0', lineHeight: '1.4' },
+        timerBadge: {
+            background: 'rgba(245, 158, 11, 0.1)',
+            color: '#f59e0b',
+            padding: '4px 10px',
             borderRadius: '20px',
+            fontSize: '11px',
+            fontWeight: 700,
+        },
+
+        listCol: { display: 'flex', flexDirection: 'column' },
+        listaHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' },
+        chipCount: { background: '#27272a', padding: '2px 10px', borderRadius: '12px', fontSize: '12px', color: '#a1a1aa' },
+
+        scrollArea: { maxHeight: 'calc(100vh - 250px)', overflowY: 'auto', paddingRight: '8px' },
+        lembreteRow: {
+            background: '#111113',
+            marginBottom: '10px',
+            borderRadius: '12px',
+            padding: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            border: '1px solid rgba(255,255,255,0.03)',
+            animation: 'slideIn 0.4s ease backwards',
+        },
+        statusIndicator: { width: '4px', height: '40px', borderRadius: '4px' },
+        lembreteContent: { flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' },
+        lembreteTitulo: { fontSize: '15px', fontWeight: 600, color: '#f1f5f9' },
+        lembreteDesc: { fontSize: '13px', color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '400px' },
+        lembreteMeta: { display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' },
+        tag: { fontSize: '10px', background: '#27272a', padding: '2px 8px', borderRadius: '4px', color: '#e2e8f0' },
+        dateText: { fontSize: '11px', color: '#64748b' },
+
+        lembreteRight: { textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '6px' },
+        statusPill: {
+            fontSize: '10px',
+            fontWeight: 700,
             padding: '2px 8px',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
+            borderRadius: '6px',
+            border: '1px solid',
+            textTransform: 'uppercase'
         },
-        prazoRelativo: {
-            fontSize: '11px', fontWeight: '600',
-        },
+        prazoTexto: { fontSize: '11px', fontWeight: 600 }
     };
 
     function calcularStatus(data_hora_prazo) {
@@ -689,177 +678,115 @@ export function GetListaLembretes() {
     return (
         <div style={styles.wrapper}>
             <style>{`
-                @keyframes fadeUp {
-                    from { opacity: 0; transform: translateY(12px); }
-                    to   { opacity: 1; transform: translateY(0); }
-                }
-                @keyframes pulse {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.3; }
-                }
-                .dash-card { animation: fadeUp 0.4s ease both; }
-                .dash-card:nth-child(1) { animation-delay: 0.05s; }
-                .dash-card:nth-child(2) { animation-delay: 0.1s; }
-                .dash-card:nth-child(3) { animation-delay: 0.15s; }
-                .dash-card:nth-child(4) { animation-delay: 0.2s; }
-                .lembrete-row:hover { background: #1a1a1a !important; }
-                .pulse { animation: pulse 1.5s ease infinite; }
-            `}</style>
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+                to { opacity: 1; transform: translateY(0); filter: blur(0); }
+            }
+            .dash-card { 
+                animation: slideIn 0.5s ease backwards;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+            }
+            .dash-card:hover {
+                transform: translateY(-4px);
+                border-color: rgba(255, 255, 255, 0.2);
+                background: rgba(255, 255, 255, 0.05) !important;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            }
+            .lembrete-row {
+                transition: all 0.2s ease;
+                cursor: pointer;
+            }
+            .lembrete-row:hover {
+                background: rgba(255, 255, 255, 0.03) !important;
+                padding-left: 12px !important;
+            }
+            ::-webkit-scrollbar { width: 6px; }
+            ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        `}</style>
 
-            {/* STATS GRID */}
+            {/* HEADER STATUS */}
             <div style={styles.statsGrid}>
-
-                {/* Total */}
-                <div className="dash-card" style={styles.statCard}>
-                    <span style={styles.statLabel}>Total</span>
-                    <span style={styles.statNumber}>{lembretes.length}</span>
-                    <span style={styles.statSub}>lembretes</span>
-                </div>
-
-                {/* Vencidos */}
-                <div className="dash-card" style={{ ...styles.statCard, borderColor: vencidos.length > 0 ? "#ef4444" : "#e5e5e5" }}>
-                    <span style={styles.statLabel}>Vencidos</span>
-                    <span style={{ ...styles.statNumber, color: vencidos.length > 0 ? "#ef4444" : "#000" }}>
-                        {vencidos.length}
-                    </span>
-                    <span style={styles.statSub}>em atraso</span>
-                </div>
-
-                {/* Urgentes */}
-                <div className="dash-card" style={{ ...styles.statCard, borderColor: urgentes.length > 0 ? "#f59e0b" : "#e5e5e5" }}>
-                    <span style={styles.statLabel}>Urgentes</span>
-                    <span style={{ ...styles.statNumber, color: urgentes.length > 0 ? "#f59e0b" : "#000" }}>
-                        {urgentes.length}
-                    </span>
-                    <span style={styles.statSub}>próximas 24h</span>
-                </div>
-
-                {/* Em dia */}
-                <div className="dash-card" style={styles.statCard}>
-                    <span style={styles.statLabel}>Em dia</span>
-                    <span style={{ ...styles.statNumber, color: "#22c55e" }}>{emDia.length}</span>
-                    <span style={styles.statSub}>no prazo</span>
-                </div>
-
+                <StatCard label="Total" value={lembretes.length} sub="Lembretes" color="#6366f1" delay="0.1s" />
+                <StatCard
+                    label="Vencidos"
+                    value={vencidos.length}
+                    sub="Ação necessária"
+                    color="#ef4444"
+                    delay="0.15s"
+                    glow={vencidos.length > 0}
+                />
+                <StatCard label="Urgentes" value={urgentes.length} sub="Próximas 24h" color="#f59e0b" delay="0.2s" />
+                <StatCard label="Em dia" value={emDia.length} sub="Organizados" color="#22c55e" delay="0.25s" />
             </div>
 
-            {/* DESTAQUES */}
-            <div style={styles.destaqueGrid}>
+            <div style={styles.mainLayout}>
+                {/* COLUNA ESQUERDA: DESTAQUES */}
+                <div style={styles.sideCol}>
+                    <h3 style={styles.sectionTitle}>Insights</h3>
 
-                {/* Mais recente */}
-                {maisRecente && (
-                    <div className="dash-card" style={styles.destaque}>
-                        <span style={styles.destaqueLabel}>◎ Mais recente</span>
-                        <p style={styles.destaqueTitulo}>{maisRecente.titulo}</p>
-                        <div style={styles.destaqueRow}>
-                            <span style={{
-                                ...styles.categoriaBadge,
-                                backgroundColor: coresPorCategoria[maisRecente.categoria] || "#6b7280"
-                            }}>
-                                {maisRecente.categoria}
-                            </span>
-                            <span style={styles.destaqueSub}>
-                                {new Date(maisRecente.data_hora_prazo).toLocaleDateString('pt-BR')}
-                            </span>
+                    {maiorPrazo && (
+                        <div className="dash-card" style={{ ...styles.destaque, borderLeft: '4px solid #f59e0b' }}>
+                            <span style={styles.destaqueLabel}>⚡ PRÓXIMO PRAZO</span>
+                            <p style={styles.destaqueTitulo}>{maiorPrazo.titulo}</p>
+                            <div style={styles.destaqueFooter}>
+                                <span style={styles.timerBadge}>{formatarPrazo(maiorPrazo.data_hora_prazo)}</span>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Mais próximo do prazo */}
-                {maiorPrazo && (
-                    <div className="dash-card" style={{ ...styles.destaque, borderColor: "#f59e0b" }}>
-                        <span style={styles.destaqueLabel}>⚡ Próximo do prazo</span>
-                        <p style={styles.destaqueTitulo}>{maiorPrazo.titulo}</p>
-                        <div style={styles.destaqueRow}>
-                            <span style={{
-                                ...styles.categoriaBadge,
-                                backgroundColor: coresPorCategoria[maiorPrazo.categoria] || "#6b7280"
-                            }}>
-                                {maiorPrazo.categoria}
-                            </span>
-                            <span style={{ ...styles.destaqueSub, color: "#f59e0b", fontWeight: 700 }}>
-                                {formatarPrazo(maiorPrazo.data_hora_prazo)}
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                {/* Categoria mais usada */}
-                <div className="dash-card" style={styles.destaque}>
-                    <span style={styles.destaqueLabel}>◈ Categoria top</span>
-                    <p style={styles.destaqueTitulo}>{categoriaMaisUsada}</p>
-                    <div style={styles.destaqueRow}>
-                        <span style={{
-                            ...styles.categoriaBadge,
-                            backgroundColor: coresPorCategoria[categoriaMaisUsada] || "#6b7280"
-                        }}>
-                            {lembretes.filter(l => l.categoria === categoriaMaisUsada).length} lembretes
-                        </span>
+                    <div className="dash-card" style={{ ...styles.destaque, borderLeft: '4px solid #6366f1' }}>
+                        <span style={styles.destaqueLabel}>◈ CATEGORIA TOP</span>
+                        <p style={styles.destaqueTitulo}>{categoriaMaisUsada}</p>
+                        <span style={styles.countBadge}>{lembretes.filter(l => l.categoria === categoriaMaisUsada).length} itens</span>
                     </div>
                 </div>
 
-            </div>
+                {/* COLUNA DIREITA: LISTA PRINCIPAL */}
+                <div style={styles.listCol}>
+                    <div style={styles.listaHeader}>
+                        <h3 style={styles.sectionTitle}>Todos os Lembretes</h3>
+                        <span style={styles.chipCount}>{lembretes.length}</span>
+                    </div>
 
-            {/* LISTA COMPLETA */}
-            <div style={styles.listaWrapper}>
-                <div style={styles.listaHeader}>
-                    <span style={styles.listaTitulo}>Todos os lembretes</span>
-                    <span style={styles.listaCount}>{lembretes.length}</span>
-                </div>
+                    <div style={styles.scrollArea}>
+                        {listaPrioridade.map((l, i) => {
+                            const status = calcularStatus(l.data_hora_prazo);
+                            const data = new Date(l.data_hora_prazo);
+                            return (
+                                <div key={l.id_lembrete} className="lembrete-row"
+                                    style={{ ...styles.lembreteRow, animationDelay: `${0.3 + (i * 0.05)}s` }}>
 
-                {listaPrioridade.map((l, i) => {
-                    const status = calcularStatus(l.data_hora_prazo);
-                    const prazo = new Date(l.data_hora_prazo);
-                    return (
-                        <div
-                            key={l.id_lembrete}
-                            className="lembrete-row"
-                            style={{
-                                ...styles.lembreteRow,
-                                animationDelay: `${0.25 + i * 0.04}s`,
-                                borderLeft: `3px solid ${coresPorCategoria[l.categoria] || "#6b7280"}`,
-                            }}
-                        >
-                            {/* Lado esquerdo */}
-                            <div style={styles.lembreteLeft}>
-                                <span style={styles.lembreteTitulo}>{l.titulo}</span>
-                                {l.descricao && (
-                                    <span style={styles.lembreteDesc}>{l.descricao}</span>
-                                )}
-                                <div style={styles.lembreteMeta}>
-                                    <span style={{
-                                        ...styles.categoriaBadge,
-                                        backgroundColor: coresPorCategoria[l.categoria] || "#6b7280",
-                                        fontSize: '9px',
-                                    }}>
-                                        {l.categoria}
-                                    </span>
-                                    <span style={styles.lembreteData}>
-                                        {prazo.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                        {' · '}
-                                        {prazo.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
+                                    <div style={{ ...styles.statusIndicator, background: coresPorCategoria[l.categoria] }} />
+
+                                    <div style={styles.lembreteContent}>
+                                        <div style={styles.lembreteMain}>
+                                            <span style={styles.lembreteTitulo}>{l.titulo}</span>
+                                            <span style={styles.lembreteDesc}> {l.descricao}</span>
+                                        </div>
+
+                                        <div style={styles.lembreteMeta}>
+                                            <span style={styles.tag}>{l.categoria}</span>
+                                            <span style={styles.dateText}>
+                                                {data.toLocaleDateString('pt-BR')} • {data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div style={styles.lembreteRight}>
+                                        <span style={{ ...styles.statusPill, color: status.cor, borderColor: status.cor }}>
+                                            {status.label}
+                                        </span>
+                                        <span style={{ ...styles.prazoTexto, color: status.cor }}>{formatarPrazo(l.data_hora_prazo)}</span>
+                                    </div>
                                 </div>
-                            </div>
-
-                            {/* Lado direito */}
-                            <div style={styles.lembreteRight}>
-                                <span style={{
-                                    ...styles.statusBadge,
-                                    color: status.cor,
-                                    borderColor: status.cor,
-                                }}>
-                                    {status.label}
-                                </span>
-                                <span style={{ ...styles.prazoRelativo, color: status.cor }}>
-                                    {formatarPrazo(l.data_hora_prazo)}
-                                </span>
-                            </div>
-                        </div>
-                    );
-                })}
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     );
+
 }
 
