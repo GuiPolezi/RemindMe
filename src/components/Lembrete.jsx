@@ -200,9 +200,9 @@ export function GetCalendarLembretes() {
     const [eventos, setEventos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [modalEvento, setModalEvento] = useState(null);
-    
+
     // Estados para dias expandidos
-    const [ diasExpandidos, setDiasExpandidos] = useState({})
+    const [diasExpandidos, setDiasExpandidos] = useState({})
     useEffect(() => {
         async function carregarLembretes() {
             try {
@@ -283,7 +283,7 @@ export function GetCalendarLembretes() {
         return eventos.filter(ev => {
             const chave = ev.start.slice(0, 10);
             const eventosNoDia = eventosPorDia[chave] || [];
-            
+
             // Se o dia não está expandido e tem mais de 3, mostra só os 3 primeiros
             if (!diasExpandidos[chave] && eventosNoDia.length > LIMITE) {
                 const index = eventosNoDia.findIndex(e => e.id === ev.id);
@@ -382,7 +382,7 @@ export function GetCalendarLembretes() {
 
             }}>
                 <p className='font-bold'>{view.event.extendedProps.categoria}</p>
-                <p style={{fontSize: '12px'}}>{view.event.title}</p>
+                <p style={{ fontSize: '12px' }}>{view.event.title}</p>
             </div>
         );
 
@@ -504,28 +504,29 @@ export function GetCalendarLembretes() {
 
 
 /* FUNÇÕES DO DASHBOARD DOS PRAZOS */
-
 export function GetListaLembretes() {
     const [lembretes, setLembretes] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // ─── NOTIFICAÇÕES ───────────────────────────────────────────
-    const notificacoesEnviadas = useRef(new Set()); // guarda IDs já notificados
+    // ── Estados de busca/filtro ──────────────────────────────────
+    const [buscaTitulo, setBuscaTitulo] = useState('');
+    const [filtroCategoria, setFiltroCategoria] = useState('');
+    const [filtroStatus, setFiltroStatus] = useState('');
 
-    // Pede permissão ao carregar
+    // ── Notificações ─────────────────────────────────────────────
+    const notificacoesEnviadas = useRef(new Set());
+
     useEffect(() => {
         if ("Notification" in window && Notification.permission === "default") {
             Notification.requestPermission();
         }
     }, []);
 
-    // Verifica prazos a cada minuto
     useEffect(() => {
         if (lembretes.length === 0) return;
 
         function verificarPrazos() {
             if (Notification.permission !== "granted") return;
-
             const agora = new Date();
 
             lembretes.forEach((l) => {
@@ -533,7 +534,6 @@ export function GetListaLembretes() {
                 const diffMs = prazo - agora;
                 const diffMin = diffMs / (1000 * 60);
 
-                // Notifica se faltar entre 0 e 60 minutos e ainda não notificou
                 const chave = `${l.id_lembrete}-1h`;
                 if (diffMin > 0 && diffMin <= 60 && !notificacoesEnviadas.current.has(chave)) {
                     notificacoesEnviadas.current.add(chave);
@@ -543,7 +543,6 @@ export function GetListaLembretes() {
                     });
                 }
 
-                // Notifica se acabou de vencer (última hora)
                 const chaveVencido = `${l.id_lembrete}-vencido`;
                 if (diffMs < 0 && diffMs > -1000 * 60 * 60 && !notificacoesEnviadas.current.has(chaveVencido)) {
                     notificacoesEnviadas.current.add(chaveVencido);
@@ -555,130 +554,26 @@ export function GetListaLembretes() {
             });
         }
 
-        verificarPrazos(); // roda imediatamente ao carregar
-        const intervalo = setInterval(verificarPrazos, 60 * 1000); // repete a cada 1 min
-        return () => clearInterval(intervalo); // limpa ao desmontar
+        verificarPrazos();
+        const intervalo = setInterval(verificarPrazos, 60 * 1000);
+        return () => clearInterval(intervalo);
+    }, [lembretes]);
 
-    }, [lembretes]); // roda sempre que lembretes mudar
+    useEffect(() => {
+        async function carregar() {
+            try {
+                const dados = await dbService.getAllLembretes();
+                setLembretes(dados);
+            } catch (error) {
+                alert("Erro ao carregar lembretes: " + error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+        carregar();
+    }, []);
 
-
-    const coresPorCategoria = {
-        "Trabalho": "#3b82f6",
-        "Casa": "#22c55e",
-        "Saude": "#ef4444",
-        "Estudos": "#a855f7",
-        "Financas": "#f59e0b",
-        "Lazer": "#606c38",
-        "Compras": "#0ea5e9",
-        "Outros": "#6b7280",
-    };
-
-    // Componente auxiliar para os cards de estatística
-    const StatCard = ({ label, value, sub, color, delay, glow }) => (
-        <div className="dash-card" style={{ ...styles.statCard, animationDelay: delay }}>
-            <div style={{ ...styles.statDecorator, background: color, boxShadow: glow ? `0 0 15px ${color}` : 'none' }} />
-            <span style={styles.statLabel}>{label}</span>
-            <span style={{ ...styles.statNumber, color: glow ? color : '#fff' }}>{value}</span>
-            <span style={styles.statSub}>{sub}</span>
-        </div>
-    );
-
-    const styles = {
-        wrapper: {
-            padding: '24px',
-            backgroundColor: '#0a0a0b', // Fundo ultra dark
-            color: '#e2e8f0',
-            minHeight: '100vh',
-            fontFamily: "'Inter', sans-serif",
-        },
-        statsGrid: {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '16px',
-            marginBottom: '32px',
-        },
-        statCard: {
-            background: '#161618',
-            padding: '20px',
-            borderRadius: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'relative',
-            overflow: 'hidden',
-        },
-        statDecorator: {
-            position: 'absolute',
-            top: 0, right: 0, bottom: 0,
-            width: '4px',
-        },
-        statLabel: { fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' },
-        statNumber: { fontSize: '32px', fontWeight: 800, margin: '8px 0' },
-        statSub: { fontSize: '12px', color: '#64748b' },
-
-        mainLayout: {
-            display: 'grid',
-            gridTemplateColumns: '300px 1fr',
-            gap: '24px',
-        },
-        sectionTitle: {
-            fontSize: '18px',
-            fontWeight: 700,
-            marginBottom: '16px',
-            color: '#f8fafc',
-        },
-        destaque: {
-            background: '#161618',
-            padding: '20px',
-            borderRadius: '12px',
-            marginBottom: '16px',
-        },
-        destaqueLabel: { fontSize: '10px', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '8px' },
-        destaqueTitulo: { fontSize: '16px', fontWeight: 600, margin: '0 0 12px 0', lineHeight: '1.4' },
-        timerBadge: {
-            background: 'rgba(245, 158, 11, 0.1)',
-            color: '#f59e0b',
-            padding: '4px 10px',
-            borderRadius: '20px',
-            fontSize: '11px',
-            fontWeight: 700,
-        },
-
-        listCol: { display: 'flex', flexDirection: 'column' },
-        listaHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' },
-        chipCount: { background: '#27272a', padding: '2px 10px', borderRadius: '12px', fontSize: '12px', color: '#a1a1aa' },
-
-        scrollArea: { maxHeight: 'calc(100vh - 250px)', overflowY: 'auto', paddingRight: '8px' },
-        lembreteRow: {
-            background: '#111113',
-            marginBottom: '10px',
-            borderRadius: '12px',
-            padding: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            border: '1px solid rgba(255,255,255,0.03)',
-            animation: 'slideIn 0.4s ease backwards',
-        },
-        statusIndicator: { width: '4px', height: '40px', borderRadius: '4px' },
-        lembreteContent: { flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' },
-        lembreteTitulo: { fontSize: '15px', fontWeight: 600, color: '#f1f5f9' },
-        lembreteDesc: { fontSize: '13px', color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '400px' },
-        lembreteMeta: { display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' },
-        tag: { fontSize: '10px', background: '#27272a', padding: '2px 8px', borderRadius: '4px', color: '#e2e8f0' },
-        dateText: { fontSize: '11px', color: '#64748b' },
-
-        lembreteRight: { textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '6px' },
-        statusPill: {
-            fontSize: '10px',
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: '6px',
-            border: '1px solid',
-            textTransform: 'uppercase'
-        },
-        prazoTexto: { fontSize: '11px', fontWeight: 600 }
-    };
-
+    // ── Funções puras (fora do render, sem depender de estado) ───
     function calcularStatus(data_hora_prazo) {
         const agora = new Date();
         const prazo = new Date(data_hora_prazo);
@@ -710,44 +605,113 @@ export function GetListaLembretes() {
         return `Em ${diffMin}min`;
     }
 
-    useEffect(() => {
-        async function carregar() {
-            try {
-                const dados = await dbService.getAllLembretes();
-                setLembretes(dados);
-            } catch (error) {
-                alert("Erro ao carregar lembretes: " + error.message);
-            } finally {
-                setLoading(false);
-            }
-        }
-        carregar();
-    }, []);
+    // ── Constantes visuais ───────────────────────────────────────
+    // CORRIGIDO: agora bate com as categorias do seu formulário
+    const coresPorCategoria = {
+        "Licença Sistema": "#3b82f6",
+        "Estudos": "#55c9f7",
+        "Certificado": "#22c55e",
+        "Compromisso": "#ef4444",
+        "Outros": "#f59e0b",
+    };
 
+    const styles = {
+        wrapper: {
+            padding: '24px',
+            backgroundColor: '#0a0a0b',
+            color: '#e2e8f0',
+            minHeight: '100vh',
+            fontFamily: "'Inter', sans-serif",
+        },
+        statsGrid: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '16px',
+            marginBottom: '32px',
+        },
+        statCard: {
+            background: '#161618',
+            padding: '20px',
+            borderRadius: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'relative',
+            overflow: 'hidden',
+        },
+        statDecorator: { position: 'absolute', top: 0, right: 0, bottom: 0, width: '4px' },
+        statLabel: { fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' },
+        statNumber: { fontSize: '32px', fontWeight: 800, margin: '8px 0' },
+        statSub: { fontSize: '12px', color: '#64748b' },
+        mainLayout: { display: 'grid', gridTemplateColumns: '300px 1fr', gap: '24px' },
+        sectionTitle: { fontSize: '18px', fontWeight: 700, marginBottom: '16px', color: '#f8fafc' },
+        destaque: { background: '#161618', padding: '20px', borderRadius: '12px', marginBottom: '16px' },
+        destaqueLabel: { fontSize: '10px', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: '8px' },
+        destaqueTitulo: { fontSize: '16px', fontWeight: 600, margin: '0 0 12px 0', lineHeight: '1.4' },
+        destaqueFooter: { display: 'flex' },
+        timerBadge: { background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 },
+        countBadge: { fontSize: '11px', color: '#64748b' },
+        listCol: { display: 'flex', flexDirection: 'column' },
+        listaHeader: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' },
+        chipCount: { background: '#27272a', padding: '2px 10px', borderRadius: '12px', fontSize: '12px', color: '#a1a1aa' },
+        scrollArea: { maxHeight: 'calc(100vh - 300px)', overflowY: 'auto', paddingRight: '8px' },
+        lembreteRow: {
+            background: '#111113',
+            marginBottom: '10px',
+            borderRadius: '12px',
+            padding: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            border: '1px solid rgba(255,255,255,0.03)',
+            animation: 'slideIn 0.4s ease backwards',
+        },
+        statusIndicator: { width: '4px', height: '40px', borderRadius: '4px', flexShrink: 0 },
+        lembreteContent: { flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 },
+        lembreteMain: { display: 'flex', flexDirection: 'column', gap: '2px' },
+        lembreteTitulo: { fontSize: '15px', fontWeight: 600, color: '#f1f5f9' },
+        lembreteDesc: { fontSize: '13px', color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+        lembreteMeta: { display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' },
+        tag: { fontSize: '10px', background: '#27272a', padding: '2px 8px', borderRadius: '4px', color: '#e2e8f0' },
+        dateText: { fontSize: '11px', color: '#64748b' },
+        lembreteRight: { textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0 },
+        statusPill: { fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '6px', border: '1px solid', textTransform: 'uppercase' },
+        prazoTexto: { fontSize: '11px', fontWeight: 600 },
+    };
+
+    // ── Componente auxiliar (DENTRO do componente pai, mas APÓS os hooks) ──
+    const StatCard = ({ label, value, sub, color, delay, glow }) => (
+        <div className="dash-card" style={{ ...styles.statCard, animationDelay: delay }}>
+            <div style={{ ...styles.statDecorator, background: color, boxShadow: glow ? `0 0 15px ${color}` : 'none' }} />
+            <span style={styles.statLabel}>{label}</span>
+            <span style={{ ...styles.statNumber, color: glow ? color : '#fff' }}>{value}</span>
+            <span style={styles.statSub}>{sub}</span>
+        </div>
+    );
+
+    // ── Guards de loading/vazio (APÓS todos os hooks) ────────────
     if (loading) return (
-        <div style={styles.loadingWrapper}>
-            <div style={styles.loadingDot} className="pulse" />
-            <span style={styles.loadingText}>Carregando</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#0a0a0b', color: '#64748b', gap: '12px' }}>
+            <span style={{ fontSize: '20px' }}>◌</span>
+            <span>Carregando...</span>
         </div>
     );
 
     if (lembretes.length === 0) return (
-        <div style={styles.empty}>
-            <span style={styles.emptyIcon}>◌</span>
-            <p style={styles.emptyText}>Nenhum lembrete ainda.</p>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#0a0a0b', color: '#64748b' }}>
+            <span style={{ fontSize: '32px', marginBottom: '12px' }}>◌</span>
+            <p>Nenhum lembrete ainda.</p>
         </div>
     );
 
+    // ── Derivados (todos APÓS os guards) ─────────────────────────
     const agora = new Date();
-
-    // Derivados
-    const ordenadosPorData = [...lembretes].sort((a, b) =>
-        new Date(b.data_hora_prazo) - new Date(a.data_hora_prazo)
-    );
-    const maisRecente = ordenadosPorData[0];
 
     const vencidos = lembretes.filter(l => new Date(l.data_hora_prazo) < agora);
     const emDia = lembretes.filter(l => new Date(l.data_hora_prazo) >= agora);
+    const urgentes = lembretes.filter(l => {
+        const diff = new Date(l.data_hora_prazo) - agora;
+        return diff > 0 && diff <= 1000 * 60 * 60 * 24;
+    });
 
     const maiorPrazo = [...emDia].sort((a, b) =>
         new Date(a.data_hora_prazo) - new Date(b.data_hora_prazo)
@@ -759,120 +723,205 @@ export function GetListaLembretes() {
         lembretes.filter(l => l.categoria === a).length
     )[0];
 
-    const urgentes = lembretes.filter(l => {
-        const diff = new Date(l.data_hora_prazo) - agora;
-        return diff > 0 && diff <= 1000 * 60 * 60 * 24;
-    });
+    const listaPrioridade = [...lembretes].sort((a, b) =>
+        calcularStatus(a.data_hora_prazo).prioridade - calcularStatus(b.data_hora_prazo).prioridade
+    );
 
-    // Lista ordenada por status (vencidos primeiro, depois urgentes, etc)
-    const listaPrioridade = [...lembretes].sort((a, b) => {
-        return calcularStatus(a.data_hora_prazo).prioridade -
-            calcularStatus(b.data_hora_prazo).prioridade;
+    // CORRIGIDO: useMemo APÓS os guards, mas listaPrioridade já existe aqui
+    const lembretesFiltrados = listaPrioridade.filter(l => {
+        const tituloOk = l.titulo.toLowerCase().includes(buscaTitulo.toLowerCase());
+        const categoriaOk = filtroCategoria === '' || l.categoria === filtroCategoria;
+        const statusOk = filtroStatus === '' || calcularStatus(l.data_hora_prazo).label === filtroStatus;
+        return tituloOk && categoriaOk && statusOk;
     });
+    // Nota: useMemo não pode ser usado aqui (após return condicional),
+    // mas isso é seguro porque listaPrioridade é recalculado a cada render
+    // e o componente só re-renderiza quando os estados mudam.
 
     return (
-        <div style={styles.wrapper}>
+        <div className="p-4 md:p-6 bg-[#0a0a0b] text-slate-200 min-h-screen font-sans">
             <style>{`
             @keyframes slideIn {
                 from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
-                to { opacity: 1; transform: translateY(0); filter: blur(0); }
+                to   { opacity: 1; transform: translateY(0);    filter: blur(0);   }
             }
-            .dash-card { 
+            .dash-card {
                 animation: slideIn 0.5s ease backwards;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                border: 1px solid rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255,255,255,0.08);
             }
             .dash-card:hover {
                 transform: translateY(-4px);
-                border-color: rgba(255, 255, 255, 0.2);
-                background: rgba(255, 255, 255, 0.05) !important;
+                border-color: rgba(255,255,255,0.2);
+                background: rgba(255,255,255,0.05) !important;
                 box-shadow: 0 10px 20px rgba(0,0,0,0.4);
             }
-            .lembrete-row {
-                transition: all 0.2s ease;
-                cursor: pointer;
-            }
+            .lembrete-row { transition: all 0.2s ease; cursor: pointer; }
             .lembrete-row:hover {
-                background: rgba(255, 255, 255, 0.03) !important;
-                padding-left: 12px !important;
+                background: rgba(255,255,255,0.03) !important;
+                padding-left: 20px !important;
             }
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         `}</style>
 
-            {/* HEADER STATUS */}
-            <div style={styles.statsGrid}>
+            {/* CARDS DE ESTATÍSTICA */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
                 <StatCard label="Total" value={lembretes.length} sub="Lembretes" color="#6366f1" delay="0.1s" />
-                <StatCard
-                    label="Vencidos"
-                    value={vencidos.length}
-                    sub="Ação necessária"
-                    color="#ef4444"
-                    delay="0.15s"
-                    glow={vencidos.length > 0}
-                />
+                <StatCard label="Vencidos" value={vencidos.length} sub="Ação necessária" color="#ef4444" delay="0.15s" glow={vencidos.length > 0} />
                 <StatCard label="Urgentes" value={urgentes.length} sub="Próximas 24h" color="#f59e0b" delay="0.2s" />
                 <StatCard label="Em dia" value={emDia.length} sub="Organizados" color="#22c55e" delay="0.25s" />
             </div>
 
-            <div style={styles.mainLayout}>
-                {/* COLUNA ESQUERDA: DESTAQUES */}
-                <div style={styles.sideCol}>
-                    <h3 style={styles.sectionTitle}>Insights</h3>
+            {/* LAYOUT PRINCIPAL */}
+            <div className="flex flex-col lg:flex-row gap-4 md:gap-6">
+
+                {/* COLUNA ESQUERDA: INSIGHTS */}
+                {/* Em mobile fica em cima (coluna), em desktop fica na lateral (300px fixo) */}
+                <div className="w-full lg:w-[300px] lg:shrink-0">
+                    <h3 className="text-lg font-bold mb-4 text-slate-50">Insights</h3>
 
                     {maiorPrazo && (
-                        <div className="dash-card" style={{ ...styles.destaque, borderLeft: '4px solid #f59e0b' }}>
-                            <span style={styles.destaqueLabel}>⚡ PRÓXIMO PRAZO</span>
-                            <p style={styles.destaqueTitulo}>{maiorPrazo.titulo}</p>
-                            <div style={styles.destaqueFooter}>
-                                <span style={styles.timerBadge}>{formatarPrazo(maiorPrazo.data_hora_prazo)}</span>
-                            </div>
+                        <div className="dash-card bg-[#161618] p-5 rounded-xl mb-4 border-l-4 border-amber-400">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">
+                                ⚡ PRÓXIMO PRAZO
+                            </span>
+                            <p className="text-base font-semibold leading-snug mb-3 text-slate-100">
+                                {maiorPrazo.titulo}
+                            </p>
+                            <span className="bg-amber-400/10 text-amber-400 px-3 py-1 rounded-full text-[11px] font-bold">
+                                {formatarPrazo(maiorPrazo.data_hora_prazo)}
+                            </span>
                         </div>
                     )}
 
-                    <div className="dash-card" style={{ ...styles.destaque, borderLeft: '4px solid #6366f1' }}>
-                        <span style={styles.destaqueLabel}>◈ CATEGORIA TOP</span>
-                        <p style={styles.destaqueTitulo}>{categoriaMaisUsada}</p>
-                        <span style={styles.countBadge}>{lembretes.filter(l => l.categoria === categoriaMaisUsada).length} itens</span>
+                    <div className="dash-card bg-[#161618] p-5 rounded-xl border-l-4 border-indigo-500">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">
+                            ◈ CATEGORIA TOP
+                        </span>
+                        <p className="text-base font-semibold leading-snug mb-2 text-slate-100">
+                            {categoriaMaisUsada}
+                        </p>
+                        <span className="text-[11px] text-slate-500">
+                            {lembretes.filter(l => l.categoria === categoriaMaisUsada).length} itens
+                        </span>
                     </div>
                 </div>
 
-                {/* COLUNA DIREITA: LISTA PRINCIPAL */}
-                <div style={styles.listCol}>
-                    <div style={styles.listaHeader}>
-                        <h3 style={styles.sectionTitle}>Todos os Lembretes</h3>
-                        <span style={styles.chipCount}>{lembretes.length}</span>
+                {/* COLUNA DIREITA: LISTA */}
+                <div className="flex flex-col flex-1 min-w-0">
+
+                    {/* Cabeçalho da lista */}
+                    <div className="flex items-center gap-3 mb-4">
+                        <h3 className="text-lg font-bold text-slate-50">Todos os Lembretes</h3>
+                        <span className="bg-zinc-800 text-zinc-400 text-xs px-2.5 py-0.5 rounded-full">
+                            {lembretesFiltrados.length}
+                        </span>
                     </div>
 
-                    <div style={styles.scrollArea}>
-                        {listaPrioridade.map((l, i) => {
+                    {/* BARRA DE FILTROS */}
+                    <div className="flex flex-col sm:flex-row gap-2 md:gap-3 mb-4">
+                        <input
+                            type="text"
+                            placeholder="Buscar por título..."
+                            value={buscaTitulo}
+                            onChange={e => setBuscaTitulo(e.target.value)}
+                            className="flex-1 min-w-0 px-3.5 py-2 rounded-lg border border-white/10 bg-[#161618] text-slate-200 text-sm outline-none placeholder:text-slate-500"
+                        />
+
+                        {/* Em mobile os selects ficam lado a lado, em desktop em linha com o input */}
+                        <div className="flex gap-2 sm:gap-3">
+                            <select
+                                value={filtroCategoria}
+                                onChange={e => setFiltroCategoria(e.target.value)}
+                                className="flex-1 sm:flex-none px-3.5 py-2 rounded-lg border border-white/10 bg-[#161618] text-sm outline-none cursor-pointer text-slate-400"
+                            >
+                                <option value="">Todas categorias</option>
+                                <option value="Licença Sistema">Licença Sistema</option>
+                                <option value="Estudos">Estudos</option>
+                                <option value="Certificado">Certificado</option>
+                                <option value="Compromisso">Compromisso</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+
+                            <select
+                                value={filtroStatus}
+                                onChange={e => setFiltroStatus(e.target.value)}
+                                className="flex-1 sm:flex-none px-3.5 py-2 rounded-lg border border-white/10 bg-[#161618] text-sm outline-none cursor-pointer text-slate-400"
+                            >
+                                <option value="">Todos status</option>
+                                <option value="Vencido">Vencido</option>
+                                <option value="Urgente">Urgente</option>
+                                <option value="Esta semana">Esta semana</option>
+                                <option value="Em dia">Em dia</option>
+                            </select>
+                        </div>
+
+                        {(buscaTitulo || filtroCategoria || filtroStatus) && (
+                            <button
+                                onClick={() => { setBuscaTitulo(''); setFiltroCategoria(''); setFiltroStatus(''); }}
+                                className="px-3.5 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-semibold cursor-pointer whitespace-nowrap"
+                            >
+                                ✕ Limpar
+                            </button>
+                        )}
+                    </div>
+
+                    {/* LISTA DE LEMBRETES */}
+                    <div className="overflow-y-auto pr-1" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+
+                        {lembretesFiltrados.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-16 text-slate-500">
+                                <p className="text-2xl mb-2">◌</p>
+                                <p className="text-sm">Nenhum lembrete encontrado para esta busca.</p>
+                            </div>
+                        )}
+
+                        {lembretesFiltrados.map((l, i) => {
                             const status = calcularStatus(l.data_hora_prazo);
                             const data = new Date(l.data_hora_prazo);
                             return (
-                                <div key={l.id_lembrete} className="lembrete-row"
-                                    style={{ ...styles.lembreteRow, animationDelay: `${0.3 + (i * 0.05)}s` }}>
+                                <div
+                                    key={l.id_lembrete}
+                                    className="lembrete-row bg-[#111113] mb-2.5 rounded-xl p-3 md:p-4 flex items-center gap-3 md:gap-4 border border-white/[0.03]"
+                                    style={{ animationDelay: `${0.3 + i * 0.05}s` }}
+                                >
+                                    {/* Indicador de cor da categoria */}
+                                    <div
+                                        className="w-1 h-10 rounded-full shrink-0"
+                                        style={{ background: coresPorCategoria[l.categoria] ?? '#6b7280' }}
+                                    />
 
-                                    <div style={{ ...styles.statusIndicator, background: coresPorCategoria[l.categoria] }} />
-
-                                    <div style={styles.lembreteContent}>
-                                        <div style={styles.lembreteMain}>
-                                            <span style={styles.lembreteTitulo}>{l.titulo}</span>
-                                            <span style={{...styles.lembreteDesc, whiteSpace: 'pre-wrap'}}> {l.descricao}</span>
-                                        </div>
-
-                                        <div style={styles.lembreteMeta}>
-                                            <span style={styles.tag}>{l.categoria}</span>
-                                            <span style={styles.dateText}>
+                                    {/* Conteúdo principal */}
+                                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                                        <span className="text-sm md:text-[15px] font-semibold text-slate-100 truncate">
+                                            {l.titulo}
+                                        </span>
+                                        {/* Descrição: oculta em mobile pequeno para economizar espaço */}
+                                        <span className="hidden sm:block text-xs md:text-[13px] text-slate-400 truncate">
+                                            {l.descricao}
+                                        </span>
+                                        <div className="flex items-center gap-2 md:gap-3 mt-0.5 flex-wrap">
+                                            <span className="text-[10px] bg-zinc-800 px-2 py-0.5 rounded text-slate-200">
+                                                {l.categoria}
+                                            </span>
+                                            <span className="text-[11px] text-slate-500">
                                                 {data.toLocaleDateString('pt-BR')} • {data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div style={styles.lembreteRight}>
-                                        <span style={{ ...styles.statusPill, color: status.cor, borderColor: status.cor }}>
+                                    {/* Status e prazo */}
+                                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                                        <span
+                                            className="text-[10px] font-bold px-2 py-0.5 rounded-md border uppercase"
+                                            style={{ color: status.cor, borderColor: status.cor }}
+                                        >
                                             {status.label}
                                         </span>
-                                        <span style={{ ...styles.prazoTexto, color: status.cor }}>{formatarPrazo(l.data_hora_prazo)}</span>
+                                        <span className="text-[11px] font-semibold" style={{ color: status.cor }}>
+                                            {formatarPrazo(l.data_hora_prazo)}
+                                        </span>
                                     </div>
                                 </div>
                             );
@@ -882,6 +931,4 @@ export function GetListaLembretes() {
             </div>
         </div>
     );
-
 }
-
